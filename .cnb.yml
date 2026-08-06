@@ -1,5 +1,5 @@
 # CNB 流水线配置
-# 1. Git Sync：每次 push 到 main 后，自动将代码同步到 GitHub（h1s97x/sduthesis）
+# 1. Git Sync：每次 push 到 main 后，自动将代码同步到 GitHub（h1s97x/DarkSouls-Tome）
 #    使用 tencentcom/git-sync 官方插件，HTTPS + Access Token 认证。
 #    敏感信息（GITHUB_USERNAME / GITHUB_TOKEN）存放在密钥仓库 secret-env，通过 imports 引用。
 # 2. Issue / PR 自动分配处理人：创建后自动将处理人设置为仓库维护者 h1s97x（QAQ）。
@@ -12,7 +12,7 @@ main:
         - name: sync to github
           image: tencentcom/git-sync
           settings:
-            target_url: https://github.com/h1s97x/sduthesis.git
+            target_url: https://github.com/h1s97x/DarkSouls-Tome.git
             auth_type: https
             username: ${GITHUB_USERNAME}
             password: ${GITHUB_TOKEN}
