@@ -33,7 +33,7 @@
       <tbody>
         <tr
           v-for="item in filteredItems"
-          :key="item.id"
+          :key="itemKey(item)"
           class="table-row"
           @click="goToDetail(item.id)"
         >
@@ -41,10 +41,10 @@
             <LazyImage :src="`/icons/${item.icon}`" :alt="displayName(item)" />
           </td>
           <td class="name-cell">
-            <span class="name-text">{{ displayName(item) }}</span>
+            <span class="name-text" v-html="highlightedName(item)"></span>
           </td>
           <td class="desc-cell">
-            <span class="desc-text">{{ truncateDescription(item) }}</span>
+            <span class="desc-text" v-html="highlightedDesc(item)"></span>
           </td>
         </tr>
       </tbody>
@@ -57,6 +57,8 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import LazyImage from '@/components/common/LazyImage.vue'
+import { ItemQuery, itemKey } from '@/services/itemQuery'
+import { highlightText, normalizeForSearch, stripFormatting } from '@/utils/formatter'
 import type { Item } from '@/types/item'
 
 const props = defineProps<{
@@ -84,22 +86,26 @@ const displayDescription = (item: Item) => {
   return item.description[userStore.currentLanguage]
 }
 
-const truncateDescription = (item: Item) => {
-  const desc = displayDescription(item)
-  const plainText = desc.replace(/<[^>]*>/g, '').replace(/\[.*?\]/g, '')
-  return plainText.length > 80 ? plainText.substring(0, 80) + '...' : plainText
+/**
+ * 过滤逻辑统一收口到 ItemQuery 查询引擎（阶段 3）
+ * 跨语言匹配名称/描述/备注，归一化（去格式标记 + 大小写不敏感）后命中。
+ */
+const filteredItems = computed(() => {
+  return ItemQuery.from(props.items).search(searchQuery.value).paginate(1, Infinity).items
+})
+
+/** 名称高亮（搜索关键词命中时显示 <mark>，先剥离格式标记避免残留 ## 等） */
+const highlightedName = (item: Item) => {
+  return highlightText(stripFormatting(displayName(item)), searchQuery.value)
 }
 
-const filteredItems = computed(() => {
-  if (!searchQuery.value) return props.items
-
-  const query = searchQuery.value.toLowerCase()
-  return props.items.filter((item) => {
-    const name = displayName(item).toLowerCase()
-    const desc = displayDescription(item).toLowerCase()
-    return name.includes(query) || desc.includes(query)
-  })
-})
+/** 描述高亮（截断前 80 字，命中关键词处高亮） */
+const highlightedDesc = (item: Item) => {
+  const desc = displayDescription(item)
+  const plain = normalizeForSearch(desc)
+  const truncated = plain.length > 80 ? plain.substring(0, 80) + '...' : plain
+  return highlightText(truncated, searchQuery.value)
+}
 
 const goToDetail = (id: string) => {
   router.push(`/ds${props.game}/${props.type}/${id}`)
@@ -313,6 +319,12 @@ const goToDetail = (id: string) => {
           font-size: 1em;
         }
       }
+
+      :deep(mark) {
+        background: rgba(153, 102, 0, 0.4);
+        color: #fe6;
+        padding: 0 0.1em;
+      }
     }
 
     .desc-cell {
@@ -324,6 +336,12 @@ const goToDetail = (id: string) => {
         color: #999;
         font-size: 0.95em;
         line-height: 1.6;
+
+        :deep(mark) {
+          background: rgba(153, 102, 0, 0.4);
+          color: #fe6;
+          padding: 0 0.1em;
+        }
       }
     }
   }

@@ -36,23 +36,36 @@ export const formatText = formatGameText
 
 /**
  * 移除格式化标记，获取纯文本
+ * 兼容：[uud][/uud]、[cgb][/cgb]、[cgd][/cgd]、[dtt][/dtt]、#0/#1/#2/#3/## 及换行符。
  */
 export function stripFormatting(text: string): string {
-  return text.replace(/(#1|#2|#3|##|#0|\n)/g, '')
+  return text
+    .replace(/\[\/?(uud|cgb|cgd|dtt)\]/g, '')
+    .replace(/#\d|##/g, '')
+    .replace(/\r?\n/g, '')
 }
 
 /**
- * 高亮搜索关键词
+ * 归一化搜索文本：去格式标记 + 统一大小写
+ * 搜索词与数据文本都经过此函数，保证「格式标记不影响命中」。
  */
-export function highlightText(text: string, keyword: string): string {
-  if (!keyword) return text
-  const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi')
-  return text.replace(regex, '<mark>$1</mark>')
+export function normalizeForSearch(text: string): string {
+  return stripFormatting(text).toLowerCase()
 }
 
 /**
  * 转义正则表达式特殊字符
  */
-function escapeRegExp(string: string): string {
+export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * 高亮搜索关键词（返回带 <mark> 标签的 HTML 片段）
+ */
+export function highlightText(text: string, keyword: string): string {
+  const query = stripFormatting(keyword).trim()
+  if (!query) return text
+  const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi')
+  return text.replace(regex, '<mark>$1</mark>')
 }

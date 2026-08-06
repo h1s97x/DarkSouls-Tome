@@ -16,7 +16,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: "pages-${{ github.ref }}"
+  group: 'pages-${{ github.ref }}'
   cancel-in-progress: false
 
 jobs:
@@ -40,6 +40,9 @@ jobs:
 
       - name: Type check
         run: npm run type-check
+
+      - name: Validate data
+        run: npm run validate:data
 
       - name: Unit tests
         run: npm test
@@ -96,8 +99,8 @@ jobs:
         with:
           body: |
             🚀 Successfully deployed to GitHub Pages!
-            
+
             📦 Build completed
             🌐 Live at: ${{ steps.deployment.outputs.page_url }}
-            
+
             ⚔️ Praise the Sun! ☀️

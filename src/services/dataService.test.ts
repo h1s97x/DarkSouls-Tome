@@ -1,6 +1,58 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { clearDataCache, getNPCList, loadItems, loadNPCIndex } from '@/services/dataLoader'
+import {
+  clearDataCache,
+  DataValidationError,
+  getNPCList,
+  loadItems,
+  loadNPCIndex
+} from '@/services/dataLoader'
 import { dataService, itemKey } from '@/services/dataService'
+import { itemArraySchema } from '@/services/schemas'
+
+describe('dataLoader 阶段3：数据校验与错误边界', () => {
+  afterEach(() => {
+    clearDataCache()
+  })
+
+  it('合法数据通过校验并返回强类型结果', async () => {
+    const items = await loadItems(1, 'weapon')
+    expect(items.length).toBeGreaterThan(0)
+    // 运行时校验通过后的类型断言（编译期已由 Item[] 保证）
+    const parsed = itemArraySchema.safeParse(items)
+    expect(parsed.success).toBe(true)
+  })
+
+  it('非法数据抛出 DataValidationError（可观测、可被错误边界捕获）', async () => {
+    // 构造非法数据：id 为空、game 越界、name 缺字段（绕过 Item 类型直接喂给 schema）
+    const bad = [
+      {
+        id: '',
+        type: 'weapon',
+        game: 99,
+        name: { chn: 'x' },
+        description: { chn: 'x', jap: 'x', eng: 'x' },
+        icon: ''
+      }
+    ]
+    const result = itemArraySchema.safeParse(bad)
+    expect(result.success).toBe(false)
+
+    // DataValidationError 类可直接构造并携带 details
+    const err = new DataValidationError('数据校验失败', result.error?.issues ?? [])
+    expect(err).toBeInstanceOf(Error)
+    expect(err.name).toBe('DataValidationError')
+    expect(err.message).toContain('数据校验失败')
+  })
+
+  it('非法枚举 game 被 schema 拒绝（数据异常可观测）', () => {
+    const bad = [{ id: '1', type: 'weapon', game: 9, name: {}, description: {}, icon: '' }]
+    const result = itemArraySchema.safeParse(bad)
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((i) => i.path.includes('game'))).toBe(true)
+    }
+  })
+})
 
 describe('dataLoader', () => {
   afterEach(() => {

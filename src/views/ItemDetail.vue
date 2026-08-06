@@ -68,7 +68,7 @@
               <p class="section-title">相关物品</p>
               <router-link
                 v-for="related in relatedItems"
-                :key="related.id"
+                :key="itemKey(related)"
                 :to="`/ds${game}/${type}/${related.id}`"
                 class="icon related-item"
               >
@@ -83,9 +83,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useGameData } from '@/composables/useGameData'
 import { useUserStore } from '@/stores/user'
+import { dataService, itemKey } from '@/services/dataService'
 import { formatGameText } from '@/utils/formatter'
 import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
 import SidebarNav from '@/components/layout/SidebarNav.vue'
@@ -127,11 +128,21 @@ const displayRemark = computed(() => {
   return item.value.remark[userStore.currentLanguage] || ''
 })
 
-const relatedItems = computed(() => {
-  if (!item.value) return []
-  const others = items.value.filter((i) => i.id !== item.value!.id)
-  return others.sort(() => Math.random() - 0.5).slice(0, 8)
-})
+const relatedItems = ref<Item[]>([])
+
+const loadRelatedItems = async () => {
+  if (!item.value) {
+    relatedItems.value = []
+    return
+  }
+  try {
+    // 相关物品查询统一收口到 dataService（同游戏同类型，排除自身）
+    relatedItems.value = await dataService.getRelatedItems(item.value)
+  } catch (e) {
+    console.error('Failed to load related items:', e)
+    relatedItems.value = []
+  }
+}
 
 const getItemName = (item: Item) => {
   return item.name[userStore.currentLanguage]
@@ -155,6 +166,15 @@ const handleImageError = (e: Event) => {
 onMounted(() => {
   loadData()
 })
+
+// 物品加载完成后加载相关物品（id 或数据变化时都触发）
+watch(
+  item,
+  () => {
+    loadRelatedItems()
+  },
+  { immediate: true }
+)
 
 watch(
   () => props.id,

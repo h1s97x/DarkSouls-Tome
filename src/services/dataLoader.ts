@@ -1,9 +1,59 @@
 import type { Dialogue, GameVersion, Item, ItemType } from '@/types/item'
+import { dialogueIndexSchema, dialogueSchema, itemArraySchema } from '@/services/schemas'
 
 type ModelKey = string
 
 /** 模块级缓存：同一模型进程内只加载一次 */
 const cache = new Map<ModelKey, unknown>()
+
+/**
+ * 数据异常类：字段漂移、类型错误等数据问题统一抛此错误，便于上层错误边界捕获与观测。
+ */
+export class DataValidationError extends Error {
+  readonly details: unknown[]
+
+  constructor(message: string, details: unknown[] = []) {
+    super(message)
+    this.name = 'DataValidationError'
+    this.details = details
+  }
+}
+
+/** 校验物品数据并返回强类型结果（数据异常抛出 DataValidationError） */
+function validateItems(raw: unknown, path: string): Item[] {
+  const result = itemArraySchema.safeParse(raw)
+  if (!result.success) {
+    throw new DataValidationError(
+      `数据校验失败：${path}（${result.error.issues.length} 处异常，请运行 npm run validate:data）`,
+      result.error.issues
+    )
+  }
+  return result.data
+}
+
+/** 校验对话数据并返回强类型结果 */
+function validateDialogue(raw: unknown, path: string): Dialogue {
+  const result = dialogueSchema.safeParse(raw)
+  if (!result.success) {
+    throw new DataValidationError(
+      `数据校验失败：${path}（${result.error.issues.length} 处异常，请运行 npm run validate:data）`,
+      result.error.issues
+    )
+  }
+  return result.data
+}
+
+/** 校验 NPC 索引并返回强类型结果 */
+function validateNPCIndex(raw: unknown): Record<GameVersion, string[]> {
+  const result = dialogueIndexSchema.safeParse(raw)
+  if (!result.success) {
+    throw new DataValidationError(
+      `数据校验失败：dialogueIndex.json（${result.error.issues.length} 处异常，请重新运行 npm run generate:dialogue-index）`,
+      result.error.issues
+    )
+  }
+  return result.data
+}
 
 /** 物品数据缓存键 */
 const itemKey = (game: GameVersion, type: ItemType) => `item:${game}:${type}`
@@ -22,7 +72,7 @@ export async function loadItems(game: GameVersion, type: ItemType): Promise<Item
   const key = itemKey(game, type)
   if (!cache.has(key)) {
     const module = await import(`@/data/ds${game}/${type}s.json`)
-    cache.set(key, module.default as Item[])
+    cache.set(key, validateItems(module.default, `ds${game}/${type}s.json`))
   }
   return cache.get(key) as Item[]
 }
@@ -34,7 +84,7 @@ export async function loadDialogue(game: GameVersion, npc: string): Promise<Dial
   const key = dialogueKey(game, npc)
   if (!cache.has(key)) {
     const module = await import(`@/data/ds${game}/dialogues/${npc}.json`)
-    cache.set(key, module.default as Dialogue)
+    cache.set(key, validateDialogue(module.default, `ds${game}/dialogues/${npc}.json`))
   }
   return cache.get(key) as Dialogue
 }
@@ -46,7 +96,7 @@ export async function loadDialogue(game: GameVersion, npc: string): Promise<Dial
 export async function loadNPCIndex(): Promise<Record<GameVersion, string[]>> {
   if (!cache.has(npcListKey)) {
     const module = await import('@/data/dialogueIndex.json')
-    cache.set(npcListKey, module.default as Record<GameVersion, string[]>)
+    cache.set(npcListKey, validateNPCIndex(module.default))
   }
   return cache.get(npcListKey) as Record<GameVersion, string[]>
 }
