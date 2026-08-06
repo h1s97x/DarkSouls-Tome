@@ -44,8 +44,8 @@
                       {{ item.name.chn }}
                     </router-link>
                   </td>
-                  <td class="game-cell">{{ getGameName(item.id) }}</td>
-                  <td class="type-cell">{{ getTypeName(item.id) }}</td>
+                  <td class="game-cell">{{ getGameName(item) }}</td>
+                  <td class="type-cell">{{ getTypeName(item) }}</td>
                   <td class="action-cell">
                     <button class="remove-btn" @click="removeFavorite(item.id)">移除</button>
                   </td>
@@ -63,6 +63,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { GAME_NAMES, ITEM_TYPE_NAMES } from '@/utils/constants'
+import { dataService } from '@/services/dataService'
 import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
 import SidebarNav from '@/components/layout/SidebarNav.vue'
 import type { Item } from '@/types/item'
@@ -79,21 +80,8 @@ const loadFavorites = async () => {
   loading.value = true
 
   try {
-    // 加载所有游戏的所有类型数据
-    const games = [1, 2, 3]
-    const types = ['weapon', 'armor', 'ring', 'item', 'magic']
-    const promises = []
-
-    for (const game of games) {
-      for (const type of types) {
-        promises.push(
-          import(`@/data/ds${game}/${type}s.json`).then((module) => module.default).catch(() => [])
-        )
-      }
-    }
-
-    const results = await Promise.all(promises)
-    allItems.value = results.flat()
+    // 统一走 dataService，模块级缓存避免重复全量加载
+    allItems.value = await dataService.getAllItems()
   } catch (error) {
     console.error('Failed to load favorites:', error)
   } finally {
@@ -101,21 +89,16 @@ const loadFavorites = async () => {
   }
 }
 
-const getGameName = (id: string) => {
-  const game = id.split('-')[0]
-  return GAME_NAMES[Number(game) as 1 | 2 | 3] || '未知'
+const getGameName = (item: Item) => {
+  return GAME_NAMES[item.game] || '未知'
 }
 
-const getTypeName = (id: string) => {
-  const parts = id.split('-')
-  const type = parts[1]
-  return ITEM_TYPE_NAMES[type as keyof typeof ITEM_TYPE_NAMES] || '未知'
+const getTypeName = (item: Item) => {
+  return ITEM_TYPE_NAMES[item.type] || '未知'
 }
 
 const getItemLink = (item: Item) => {
-  const game = item.id.split('-')[0]
-  const type = item.id.split('-')[1]
-  return `/ds${game}/${type}/${item.id}`
+  return `/ds${item.game}/${item.type}/${item.id}`
 }
 
 const removeFavorite = (id: string) => {

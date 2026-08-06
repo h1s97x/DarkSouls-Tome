@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { GAME_NAMES } from '@/utils/constants'
+import { dataService } from '@/services/dataService'
 import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
 import SidebarNav from '@/components/layout/SidebarNav.vue'
 import DialogueCard from '@/components/dialogue/DialogueCard.vue'
@@ -58,8 +59,7 @@ const loadDialogue = async () => {
   error.value = null
 
   try {
-    const module = await import(`@/data/ds${props.game}/dialogues/${props.npc}.json`)
-    dialogue.value = module.default
+    dialogue.value = await dataService.getDialogue(gameNum.value, props.npc)
   } catch (e) {
     error.value = e as Error
     console.error(`Failed to load dialogue for ${props.npc}:`, e)
