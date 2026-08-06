@@ -35,7 +35,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in favoriteItems" :key="item.id" class="table-row">
+                <tr v-for="item in favoriteItems" :key="itemKey(item)" class="table-row">
                   <td class="icon-cell">
                     <img :src="`/icons/${item.icon}`" :alt="item.name.chn" />
                   </td>
@@ -47,7 +47,7 @@
                   <td class="game-cell">{{ getGameName(item) }}</td>
                   <td class="type-cell">{{ getTypeName(item) }}</td>
                   <td class="action-cell">
-                    <button class="remove-btn" @click="removeFavorite(item.id)">移除</button>
+                    <button class="remove-btn" @click="removeFavorite(item)">移除</button>
                   </td>
                 </tr>
               </tbody>
@@ -63,7 +63,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { GAME_NAMES, ITEM_TYPE_NAMES } from '@/utils/constants'
-import { dataService } from '@/services/dataService'
+import { dataService, itemKey } from '@/services/dataService'
 import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
 import SidebarNav from '@/components/layout/SidebarNav.vue'
 import type { Item } from '@/types/item'
@@ -73,7 +73,7 @@ const loading = ref(true)
 const allItems = ref<Item[]>([])
 
 const favoriteItems = computed(() => {
-  return allItems.value.filter((item) => userStore.isFavorite(item.id))
+  return allItems.value.filter((item) => userStore.isFavorite(item))
 })
 
 const loadFavorites = async () => {
@@ -101,14 +101,14 @@ const getItemLink = (item: Item) => {
   return `/ds${item.game}/${item.type}/${item.id}`
 }
 
-const removeFavorite = (id: string) => {
-  userStore.toggleFavorite(id)
+const removeFavorite = (item: Item) => {
+  userStore.removeFavorite(item)
 }
 
 const clearAll = () => {
   if (confirm('确定要清空所有收藏吗？')) {
     favoriteItems.value.forEach((item) => {
-      userStore.toggleFavorite(item.id)
+      userStore.removeFavorite(item)
     })
   }
 }

@@ -30,7 +30,7 @@
             >
               <div class="npc-icon">
                 <img
-                  :src="`/icons/dialogue${game}/${npc}.webp`"
+                  :src="`/icons/ds${game}/dialogues/${npc}.webp`"
                   :alt="npc"
                   @error="handleImageError"
                 />
@@ -47,6 +47,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { GAME_NAMES } from '@/utils/constants'
+import { dataService } from '@/services/dataService'
 import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
 import SidebarNav from '@/components/layout/SidebarNav.vue'
 import type { GameVersion } from '@/types/item'
@@ -65,164 +66,13 @@ const title = computed(() => {
   return `${GAME_NAMES[gameNum.value]} - NPC对话`
 })
 
-// NPC 列表（根据实际数据文件）
-const npcLists: Record<number, string[]> = {
-  1: [
-    'alvina',
-    'anastacia',
-    'andre',
-    'artorias',
-    'aside',
-    'chester',
-    'ciaran',
-    'crestfallen',
-    'darkmoon',
-    'domhnall',
-    'dusk',
-    'eingyi',
-    'elizabeth',
-    'fortressknight',
-    'frampt',
-    'giantsmith',
-    'gough',
-    'griggs',
-    'gwyndolin',
-    'gwynevere',
-    'ingward',
-    'kaathe',
-    'laurentius',
-    'lautrec',
-    'logan',
-    'nest',
-    'nico',
-    'oscar',
-    'oswald',
-    'patches',
-    'petrus',
-    'quelana',
-    'quelaag',
-    'reah',
-    'rhea',
-    'rickert',
-    'shiva',
-    'sieglinde',
-    'siegmeyer',
-    'solaire',
-    'undead',
-    'vamos',
-    'velka',
-    'vince',
-    'witch',
-    'yulia'
-  ],
-  2: [
-    'agdayne',
-    'aldia',
-    'alsanna',
-    'ancient',
-    'ashen',
-    'aslatiel',
-    'bashful',
-    'bell',
-    'benhart',
-    'blacksmith',
-    'blue',
-    'bradley',
-    'cale',
-    'carhillion',
-    'cat',
-    'chancellor',
-    'chloanne',
-    'creighton',
-    'cromwell',
-    'darkdiver',
-    'drummond',
-    'dull',
-    'emerald',
-    'felkin',
-    'fencer',
-    'forlorn',
-    'galvan',
-    'gavlan',
-    'gilligan',
-    'grave',
-    'head',
-    'jester',
-    'laddersmith',
-    'lenigrast',
-    'lonesome',
-    'lucatiel',
-    'magerold',
-    'maughlin',
-    'melinda',
-    'merchant',
-    'mild',
-    'milibeth',
-    'nashandra',
-    'navlaan',
-    'ornifex',
-    'pate',
-    'pilgrim',
-    'rosabeth',
-    'royal',
-    'saulden',
-    'shanalotte',
-    'steady',
-    'stone',
-    'straid',
-    'sweet',
-    'titchy',
-    'vendrick',
-    'weaponsmith'
-  ],
-  3: [
-    'andre',
-    'anri',
-    'archdeacon',
-    'blacksmith',
-    'cornyx',
-    'corvian',
-    'daughter',
-    'eygon',
-    'firekeeper',
-    'giant',
-    'greirat',
-    'handmaid',
-    'hawkwood',
-    'horace',
-    'irina',
-    'karla',
-    'knight',
-    'lapp',
-    'leonhard',
-    'locust',
-    'londor',
-    'ludleth',
-    'orbeck',
-    'painter',
-    'patches',
-    'pilgrim',
-    'ringfinger',
-    'rosaria',
-    'shira',
-    'shrine',
-    'siegward',
-    'sirris',
-    'slave',
-    'stone',
-    'unbreakable',
-    'velka',
-    'yoel',
-    'yuria'
-  ]
-}
-
-const loadNPCList = () => {
+// NPC 列表由数据索引驱动（src/data/dialogueIndex.json），与数据目录 100% 一致
+const loadNPCList = async () => {
   loading.value = true
   error.value = null
 
   try {
-    npcList.value = npcLists[gameNum.value] || []
+    npcList.value = await dataService.getNPCList(gameNum.value)
   } catch (e) {
     error.value = '加载NPC列表失败'
     console.error('Failed to load NPC list:', e)

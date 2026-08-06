@@ -109,7 +109,7 @@ const item = computed(() => {
 })
 
 const isFavorite = computed(() => {
-  return item.value ? userStore.isFavorite(item.value.id) : false
+  return item.value ? userStore.isFavorite(item.value) : false
 })
 
 const displayName = computed(() => {
@@ -143,7 +143,7 @@ const formatText = (text: string) => {
 
 const toggleFavorite = () => {
   if (item.value) {
-    userStore.toggleFavorite(item.value.id)
+    userStore.toggleFavorite(item.value)
   }
 }
 

@@ -27,28 +27,3 @@ export const LANGUAGE_LABELS = {
   jap: '日本語',
   eng: 'English'
 }
-
-// 各游戏各类型的物品数量
-export const ITEM_COUNTS: Record<GameVersion, Record<ItemType, number>> = {
-  1: {
-    weapon: 198,
-    armor: 245,
-    ring: 44,
-    item: 144,
-    magic: 72
-  },
-  2: {
-    weapon: 374,
-    armor: 481,
-    ring: 77,
-    item: 205,
-    magic: 125
-  },
-  3: {
-    weapon: 321,
-    armor: 394,
-    ring: 80,
-    item: 241,
-    magic: 108
-  }
-}

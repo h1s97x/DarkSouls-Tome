@@ -11,6 +11,9 @@ const itemKey = (game: GameVersion, type: ItemType) => `item:${game}:${type}`
 /** 对话数据缓存键 */
 const dialogueKey = (game: GameVersion, npc: string) => `dialogue:${game}:${npc}`
 
+/** NPC 索引缓存键 */
+const npcListKey = 'npc-list'
+
 /**
  * 加载某游戏某类型的物品数据
  * 参考 eldenring-api 的 JSONLoader：模块级缓存，重复请求直接命中。
@@ -34,6 +37,26 @@ export async function loadDialogue(game: GameVersion, npc: string): Promise<Dial
     cache.set(key, module.default as Dialogue)
   }
   return cache.get(key) as Dialogue
+}
+
+/**
+ * 加载 NPC 索引（数据驱动：由 dialogueIndex.json 派生，替代手写硬编码数组）
+ * 索引文件很小（~1KB），模块级缓存只加载一次。
+ */
+export async function loadNPCIndex(): Promise<Record<GameVersion, string[]>> {
+  if (!cache.has(npcListKey)) {
+    const module = await import('@/data/dialogueIndex.json')
+    cache.set(npcListKey, module.default as Record<GameVersion, string[]>)
+  }
+  return cache.get(npcListKey) as Record<GameVersion, string[]>
+}
+
+/**
+ * 加载某游戏的全部 NPC 列表（由索引派生，顺序与数据目录一致）
+ */
+export async function getNPCList(game: GameVersion): Promise<string[]> {
+  const index = await loadNPCIndex()
+  return index[game] ?? []
 }
 
 /**
