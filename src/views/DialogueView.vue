@@ -15,7 +15,7 @@
           <div v-else-if="error" class="error">
             <p>❌ 加载失败</p>
             <p class="error-message">{{ error.message }}</p>
-            <button @click="loadDialogue" class="retry-btn">重试</button>
+            <button class="retry-btn" @click="loadDialogue">重试</button>
           </div>
 
           <div v-else-if="!dialogue" class="empty">
@@ -31,46 +31,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { GAME_NAMES } from '@/utils/constants';
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue';
-import SidebarNav from '@/components/layout/SidebarNav.vue';
-import DialogueCard from '@/components/dialogue/DialogueCard.vue';
-import type { Dialogue, GameVersion } from '@/types/item';
+import { ref, computed, onMounted } from 'vue'
+import { GAME_NAMES } from '@/utils/constants'
+import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
+import SidebarNav from '@/components/layout/SidebarNav.vue'
+import DialogueCard from '@/components/dialogue/DialogueCard.vue'
+import type { Dialogue, GameVersion } from '@/types/item'
 
 const props = defineProps<{
-  game: string;
-  npc: string;
-}>();
+  game: string
+  npc: string
+}>()
 
-const dialogue = ref<Dialogue | null>(null);
-const loading = ref(false);
-const error = ref<Error | null>(null);
+const dialogue = ref<Dialogue | null>(null)
+const loading = ref(false)
+const error = ref<Error | null>(null)
 
-const gameNum = computed(() => Number(props.game) as GameVersion);
+const gameNum = computed(() => Number(props.game) as GameVersion)
 
 const title = computed(() => {
-  return `${GAME_NAMES[gameNum.value]} - ${props.npc}`;
-});
+  return `${GAME_NAMES[gameNum.value]} - ${props.npc}`
+})
 
 const loadDialogue = async () => {
-  loading.value = true;
-  error.value = null;
+  loading.value = true
+  error.value = null
 
   try {
-    const module = await import(`@/data/ds${props.game}/dialogues/${props.npc}.json`);
-    dialogue.value = module.default;
+    const module = await import(`@/data/ds${props.game}/dialogues/${props.npc}.json`)
+    dialogue.value = module.default
   } catch (e) {
-    error.value = e as Error;
-    console.error(`Failed to load dialogue for ${props.npc}:`, e);
+    error.value = e as Error
+    console.error(`Failed to load dialogue for ${props.npc}:`, e)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 onMounted(() => {
-  loadDialogue();
-});
+  loadDialogue()
+})
 </script>
 
 <style scoped lang="scss">
@@ -160,6 +160,8 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

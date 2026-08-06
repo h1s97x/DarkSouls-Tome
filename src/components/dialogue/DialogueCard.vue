@@ -8,13 +8,13 @@
     </div>
 
     <div class="dialogue-lines">
-      <div 
-        v-for="line in dialogue.lines" 
+      <div
+        v-for="line in dialogue.lines"
         :key="line.index"
         class="dialogue-line"
-        :class="{ 
+        :class="{
           'is-title': line.isTitle,
-          'is-unused': line.isUnused 
+          'is-unused': line.isUnused
         }"
       >
         <span class="line-index">{{ line.index }}</span>
@@ -25,24 +25,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useUserStore } from '@/stores/user';
-import LazyImage from '@/components/common/LazyImage.vue';
-import type { Dialogue, DialogueLine } from '@/types/item';
+import { computed } from 'vue'
+import { useUserStore } from '@/stores/user'
+import LazyImage from '@/components/common/LazyImage.vue'
+import type { Dialogue, DialogueLine } from '@/types/item'
 
 const props = defineProps<{
-  dialogue: Dialogue;
-}>();
+  dialogue: Dialogue
+}>()
 
-const userStore = useUserStore();
+const userStore = useUserStore()
 
 const avatarPath = computed(() => {
-  return props.dialogue.avatar;
-});
+  return props.dialogue.avatar
+})
 
 const getLineText = (line: DialogueLine) => {
-  return line[userStore.currentLanguage];
-};
+  return line[userStore.currentLanguage]
+}
 </script>
 
 <style scoped lang="scss">

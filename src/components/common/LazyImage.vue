@@ -9,16 +9,16 @@
 </template>
 
 <script setup lang="ts">
-import { useLazyImage } from '@/composables/useLazyImage';
+import { useLazyImage } from '@/composables/useLazyImage'
 
 const props = defineProps<{
-  src: string;
-  alt: string;
-  placeholder?: string;
-}>();
+  src: string
+  alt: string
+  placeholder?: string
+}>()
 
 // @ts-expect-error imgElement is used via template ref
-const { src, isLoaded, error, imgElement } = useLazyImage(props.src, props.placeholder);
+const { src, isLoaded, error, imgElement } = useLazyImage(props.src, props.placeholder)
 </script>
 
 <style scoped lang="scss">

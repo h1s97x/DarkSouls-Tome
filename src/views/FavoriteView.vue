@@ -21,7 +21,7 @@
           <div v-else class="favorites-content">
             <div class="favorites-header">
               <p class="item-count">共 {{ favoriteItems.length }} 项收藏</p>
-              <button @click="clearAll" class="clear-btn">清空收藏</button>
+              <button class="clear-btn" @click="clearAll">清空收藏</button>
             </div>
 
             <table class="favorites-table">
@@ -35,13 +35,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr 
-                  v-for="item in favoriteItems" 
-                  :key="item.id"
-                  class="table-row"
-                >
+                <tr v-for="item in favoriteItems" :key="item.id" class="table-row">
                   <td class="icon-cell">
-                    <img :src="`/icons/${item.icon}`" :alt="item.name.chn">
+                    <img :src="`/icons/${item.icon}`" :alt="item.name.chn" />
                   </td>
                   <td class="name-cell">
                     <router-link :to="getItemLink(item)" class="item-link">
@@ -51,9 +47,7 @@
                   <td class="game-cell">{{ getGameName(item.id) }}</td>
                   <td class="type-cell">{{ getTypeName(item.id) }}</td>
                   <td class="action-cell">
-                    <button @click="removeFavorite(item.id)" class="remove-btn">
-                      移除
-                    </button>
+                    <button class="remove-btn" @click="removeFavorite(item.id)">移除</button>
                   </td>
                 </tr>
               </tbody>
@@ -66,81 +60,79 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useUserStore } from '@/stores/user';
-import { GAME_NAMES, ITEM_TYPE_NAMES } from '@/utils/constants';
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue';
-import SidebarNav from '@/components/layout/SidebarNav.vue';
-import type { Item } from '@/types/item';
+import { ref, computed, onMounted } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { GAME_NAMES, ITEM_TYPE_NAMES } from '@/utils/constants'
+import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
+import SidebarNav from '@/components/layout/SidebarNav.vue'
+import type { Item } from '@/types/item'
 
-const userStore = useUserStore();
-const loading = ref(true);
-const allItems = ref<Item[]>([]);
+const userStore = useUserStore()
+const loading = ref(true)
+const allItems = ref<Item[]>([])
 
 const favoriteItems = computed(() => {
-  return allItems.value.filter(item => userStore.isFavorite(item.id));
-});
+  return allItems.value.filter((item) => userStore.isFavorite(item.id))
+})
 
 const loadFavorites = async () => {
-  loading.value = true;
-  
+  loading.value = true
+
   try {
     // 加载所有游戏的所有类型数据
-    const games = [1, 2, 3];
-    const types = ['weapon', 'armor', 'ring', 'item', 'magic'];
-    const promises = [];
+    const games = [1, 2, 3]
+    const types = ['weapon', 'armor', 'ring', 'item', 'magic']
+    const promises = []
 
     for (const game of games) {
       for (const type of types) {
         promises.push(
-          import(`@/data/ds${game}/${type}s.json`)
-            .then(module => module.default)
-            .catch(() => [])
-        );
+          import(`@/data/ds${game}/${type}s.json`).then((module) => module.default).catch(() => [])
+        )
       }
     }
 
-    const results = await Promise.all(promises);
-    allItems.value = results.flat();
+    const results = await Promise.all(promises)
+    allItems.value = results.flat()
   } catch (error) {
-    console.error('Failed to load favorites:', error);
+    console.error('Failed to load favorites:', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const getGameName = (id: string) => {
-  const game = id.split('-')[0];
-  return GAME_NAMES[Number(game) as 1 | 2 | 3] || '未知';
-};
+  const game = id.split('-')[0]
+  return GAME_NAMES[Number(game) as 1 | 2 | 3] || '未知'
+}
 
 const getTypeName = (id: string) => {
-  const parts = id.split('-');
-  const type = parts[1];
-  return ITEM_TYPE_NAMES[type as keyof typeof ITEM_TYPE_NAMES] || '未知';
-};
+  const parts = id.split('-')
+  const type = parts[1]
+  return ITEM_TYPE_NAMES[type as keyof typeof ITEM_TYPE_NAMES] || '未知'
+}
 
 const getItemLink = (item: Item) => {
-  const game = item.id.split('-')[0];
-  const type = item.id.split('-')[1];
-  return `/ds${game}/${type}/${item.id}`;
-};
+  const game = item.id.split('-')[0]
+  const type = item.id.split('-')[1]
+  return `/ds${game}/${type}/${item.id}`
+}
 
 const removeFavorite = (id: string) => {
-  userStore.toggleFavorite(id);
-};
+  userStore.toggleFavorite(id)
+}
 
 const clearAll = () => {
   if (confirm('确定要清空所有收藏吗？')) {
-    favoriteItems.value.forEach(item => {
-      userStore.toggleFavorite(item.id);
-    });
+    favoriteItems.value.forEach((item) => {
+      userStore.toggleFavorite(item.id)
+    })
   }
-};
+}
 
 onMounted(() => {
-  loadFavorites();
-});
+  loadFavorites()
+})
 </script>
 
 <style scoped lang="scss">
@@ -222,7 +214,7 @@ onMounted(() => {
 .favorites-content {
   background: #111;
   padding: 1.5em;
-  box-shadow: inset 0 0 .3em .1em #531;
+  box-shadow: inset 0 0 0.3em 0.1em #531;
 
   @media (max-width: 1000px) {
     padding: 1em;

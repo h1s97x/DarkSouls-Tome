@@ -3,12 +3,7 @@
     <div class="table-header">
       <h2>{{ title }}</h2>
       <div class="table-controls">
-        <input 
-          v-model="searchQuery" 
-          type="text" 
-          placeholder="搜索物品..."
-          class="search-input"
-        >
+        <input v-model="searchQuery" type="text" placeholder="搜索物品..." class="search-input" />
         <span class="item-count">共 {{ filteredItems.length }} 项</span>
       </div>
     </div>
@@ -36,11 +31,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr 
-          v-for="item in filteredItems" 
+        <tr
+          v-for="item in filteredItems"
           :key="item.id"
-          @click="goToDetail(item.id)"
           class="table-row"
+          @click="goToDetail(item.id)"
         >
           <td class="icon-cell">
             <LazyImage :src="`/icons/${item.icon}`" :alt="displayName(item)" />
@@ -58,57 +53,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
-import LazyImage from '@/components/common/LazyImage.vue';
-import type { Item } from '@/types/item';
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import LazyImage from '@/components/common/LazyImage.vue'
+import type { Item } from '@/types/item'
 
 const props = defineProps<{
-  items: Item[];
-  title: string;
-  game: number;
-  type: string;
-  loading?: boolean;
-  error?: string;
-}>();
+  items: Item[]
+  title: string
+  game: number
+  type: string
+  loading?: boolean
+  error?: string
+}>()
 
 defineEmits<{
-  retry: [];
-}>();
+  retry: []
+}>()
 
-const router = useRouter();
-const userStore = useUserStore();
-const searchQuery = ref('');
+const router = useRouter()
+const userStore = useUserStore()
+const searchQuery = ref('')
 
 const displayName = (item: Item) => {
-  return item.name[userStore.currentLanguage];
-};
+  return item.name[userStore.currentLanguage]
+}
 
 const displayDescription = (item: Item) => {
-  return item.description[userStore.currentLanguage];
-};
+  return item.description[userStore.currentLanguage]
+}
 
 const truncateDescription = (item: Item) => {
-  const desc = displayDescription(item);
-  const plainText = desc.replace(/<[^>]*>/g, '').replace(/\[.*?\]/g, '');
-  return plainText.length > 80 ? plainText.substring(0, 80) + '...' : plainText;
-};
+  const desc = displayDescription(item)
+  const plainText = desc.replace(/<[^>]*>/g, '').replace(/\[.*?\]/g, '')
+  return plainText.length > 80 ? plainText.substring(0, 80) + '...' : plainText
+}
 
 const filteredItems = computed(() => {
-  if (!searchQuery.value) return props.items;
-  
-  const query = searchQuery.value.toLowerCase();
-  return props.items.filter(item => {
-    const name = displayName(item).toLowerCase();
-    const desc = displayDescription(item).toLowerCase();
-    return name.includes(query) || desc.includes(query);
-  });
-});
+  if (!searchQuery.value) return props.items
+
+  const query = searchQuery.value.toLowerCase()
+  return props.items.filter((item) => {
+    const name = displayName(item).toLowerCase()
+    const desc = displayDescription(item).toLowerCase()
+    return name.includes(query) || desc.includes(query)
+  })
+})
 
 const goToDetail = (id: string) => {
-  router.push(`/ds${props.game}/${props.type}/${id}`);
-};
+  router.push(`/ds${props.game}/${props.type}/${id}`)
+}
 </script>
 
 <style scoped lang="scss">
@@ -216,7 +211,7 @@ const goToDetail = (id: string) => {
   width: 100%;
   border-collapse: collapse;
   background: #111;
-  box-shadow: inset 0 0 .3em .1em #531;
+  box-shadow: inset 0 0 0.3em 0.1em #531;
 
   thead {
     background: #222;

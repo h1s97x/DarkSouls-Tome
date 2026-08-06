@@ -12,7 +12,7 @@
         <h3 class="section-title">游戏</h3>
         <ul class="nav-list">
           <li v-for="game in [1, 2, 3]" :key="game">
-            <router-link 
+            <router-link
               :to="`/ds${game}/${currentType}`"
               :class="{ active: currentGame === game }"
               @click="closeSidebar"
@@ -28,7 +28,7 @@
         <h3 class="section-title">物品</h3>
         <ul class="nav-list">
           <li v-for="type in itemTypes" :key="type.value">
-            <router-link 
+            <router-link
               :to="`/ds${currentGame}/${type.value}`"
               :class="{ active: currentType === type.value }"
               @click="closeSidebar"
@@ -44,20 +44,12 @@
         <h3 class="section-title">其他</h3>
         <ul class="nav-list">
           <li>
-            <router-link 
-              :to="`/ds${currentGame}/dialogue`"
-              @click="closeSidebar"
-            >
+            <router-link :to="`/ds${currentGame}/dialogue`" @click="closeSidebar">
               对话
             </router-link>
           </li>
           <li>
-            <router-link 
-              to="/favorites"
-              @click="closeSidebar"
-            >
-              收藏
-            </router-link>
+            <router-link to="/favorites" @click="closeSidebar"> 收藏 </router-link>
           </li>
         </ul>
       </div>
@@ -66,21 +58,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import type { ItemType } from '@/types/item';
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import type { ItemType } from '@/types/item'
 
-const route = useRoute();
-const isOpen = ref(false);
+const route = useRoute()
+const isOpen = ref(false)
 
 const currentGame = computed(() => {
-  const game = route.params.game as string;
-  return game ? Number(game) : 1;
-});
+  const game = route.params.game as string
+  return game ? Number(game) : 1
+})
 
 const currentType = computed(() => {
-  return (route.params.type as ItemType) || 'weapon';
-});
+  return (route.params.type as ItemType) || 'weapon'
+})
 
 const itemTypes = [
   { value: 'weapon' as ItemType, label: '武器' },
@@ -88,15 +80,15 @@ const itemTypes = [
   { value: 'ring' as ItemType, label: '戒指' },
   { value: 'item' as ItemType, label: '物品' },
   { value: 'magic' as ItemType, label: '法术' }
-];
+]
 
 const toggleSidebar = () => {
-  isOpen.value = !isOpen.value;
-};
+  isOpen.value = !isOpen.value
+}
 
 const closeSidebar = () => {
-  isOpen.value = false;
-};
+  isOpen.value = false
+}
 </script>
 
 <style scoped lang="scss">

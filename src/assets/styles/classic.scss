@@ -7,28 +7,31 @@
   background: #111;
   padding: 3em 2em;
   margin: 1em 0 2em;
-  box-shadow: inset 0 0 .3em .1em #531;
-  font: 18px/1.5 仿宋, SimSun, serif;
+  box-shadow: inset 0 0 0.3em 0.1em #531;
+  font:
+    18px/1.5 仿宋,
+    SimSun,
+    serif;
   color: #ccc;
 }
 
 // 经典边框样式
 @mixin classic-border {
   border-bottom: 1px solid #430;
-  padding: .25em 0;
+  padding: 0.25em 0;
 }
 
 // 特殊文本样式
 .uud {
   text-decoration: line-through;
-  text-decoration-color: rgba(255, 0, 0, .4);
-  text-decoration-thickness: .2em;
+  text-decoration-color: rgba(255, 0, 0, 0.4);
+  text-decoration-thickness: 0.2em;
 }
 
 .cgb {
   text-decoration: line-through;
-  text-decoration-color: rgba(255, 238, 102, .8);
-  text-decoration-thickness: .2em;
+  text-decoration-color: rgba(255, 238, 102, 0.8);
+  text-decoration-thickness: 0.2em;
 }
 
 .cgd {
@@ -36,7 +39,7 @@
 }
 
 .dtt {
-  font-size: .8em;
+  font-size: 0.8em;
   font-weight: 700;
   color: #fff;
   background: linear-gradient(to right, rgba(80, 48, 1, 0), #531, rgba(80, 48, 1, 0));

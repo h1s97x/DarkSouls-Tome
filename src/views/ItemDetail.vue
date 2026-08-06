@@ -24,17 +24,17 @@
           <div class="frame">
             <!-- 标题装饰线 -->
             <div class="title-line"></div>
-            
+
             <!-- 物品标题 -->
             <div class="item-title">{{ displayName }}</div>
-            
+
             <div class="title-line"></div>
 
             <!-- 内容区域 -->
             <div class="content-wrapper">
               <!-- 左侧图标 -->
               <div class="left-icon">
-                <img :src="item.icon" :alt="displayName" @error="handleImageError">
+                <img :src="item.icon" :alt="displayName" @error="handleImageError" />
               </div>
 
               <!-- 右侧内容 -->
@@ -43,7 +43,11 @@
                 <div class="item-desc" v-html="formatText(displayDescription)"></div>
 
                 <!-- 备注 -->
-                <div v-if="displayRemark" class="item-remk" v-html="formatText(displayRemark)"></div>
+                <div
+                  v-if="displayRemark"
+                  class="item-remk"
+                  v-html="formatText(displayRemark)"
+                ></div>
               </div>
             </div>
 
@@ -52,7 +56,7 @@
 
             <!-- 收藏按钮 -->
             <div class="actions">
-              <button @click="toggleFavorite" class="favorite-btn" :class="{ active: isFavorite }">
+              <button class="favorite-btn" :class="{ active: isFavorite }" @click="toggleFavorite">
                 {{ isFavorite ? '★ 已收藏' : '☆ 收藏' }}
               </button>
             </div>
@@ -68,7 +72,7 @@
                 :to="`/ds${game}/${type}/${related.id}`"
                 class="icon related-item"
               >
-                <img :src="related.icon" :alt="getItemName(related)" @error="handleImageError">
+                <img :src="related.icon" :alt="getItemName(related)" @error="handleImageError" />
               </router-link>
             </div>
           </div>
@@ -79,84 +83,87 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue';
-import { useGameData } from '@/composables/useGameData';
-import { useUserStore } from '@/stores/user';
-import { formatGameText } from '@/utils/formatter';
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue';
-import SidebarNav from '@/components/layout/SidebarNav.vue';
-import type { GameVersion, ItemType, Item } from '@/types/item';
+import { computed, onMounted, watch } from 'vue'
+import { useGameData } from '@/composables/useGameData'
+import { useUserStore } from '@/stores/user'
+import { formatGameText } from '@/utils/formatter'
+import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
+import SidebarNav from '@/components/layout/SidebarNav.vue'
+import type { GameVersion, ItemType, Item } from '@/types/item'
 
 const props = defineProps<{
-  game: string;
-  type: string;
-  id: string;
-}>();
+  game: string
+  type: string
+  id: string
+}>()
 
-const userStore = useUserStore();
+const userStore = useUserStore()
 
-const gameNum = computed(() => Number(props.game) as GameVersion);
-const itemType = computed(() => props.type as ItemType);
+const gameNum = computed(() => Number(props.game) as GameVersion)
+const itemType = computed(() => props.type as ItemType)
 
-const { items, loading, error, loadData } = useGameData(gameNum.value, itemType.value);
+const { items, loading, error, loadData } = useGameData(gameNum.value, itemType.value)
 
 const item = computed(() => {
-  return items.value.find(i => i.id === props.id);
-});
+  return items.value.find((i) => i.id === props.id)
+})
 
 const isFavorite = computed(() => {
-  return item.value ? userStore.isFavorite(item.value.id) : false;
-});
+  return item.value ? userStore.isFavorite(item.value.id) : false
+})
 
 const displayName = computed(() => {
-  if (!item.value) return '';
-  return item.value.name[userStore.currentLanguage];
-});
+  if (!item.value) return ''
+  return item.value.name[userStore.currentLanguage]
+})
 
 const displayDescription = computed(() => {
-  if (!item.value) return '';
-  return item.value.description[userStore.currentLanguage];
-});
+  if (!item.value) return ''
+  return item.value.description[userStore.currentLanguage]
+})
 
 const displayRemark = computed(() => {
-  if (!item.value || !item.value.remark) return '';
-  return item.value.remark[userStore.currentLanguage] || '';
-});
+  if (!item.value || !item.value.remark) return ''
+  return item.value.remark[userStore.currentLanguage] || ''
+})
 
 const relatedItems = computed(() => {
-  if (!item.value) return [];
-  const others = items.value.filter(i => i.id !== item.value!.id);
-  return others.sort(() => Math.random() - 0.5).slice(0, 8);
-});
+  if (!item.value) return []
+  const others = items.value.filter((i) => i.id !== item.value!.id)
+  return others.sort(() => Math.random() - 0.5).slice(0, 8)
+})
 
 const getItemName = (item: Item) => {
-  return item.name[userStore.currentLanguage];
-};
+  return item.name[userStore.currentLanguage]
+}
 
 const formatText = (text: string) => {
-  return formatGameText(text || '');
-};
+  return formatGameText(text || '')
+}
 
 const toggleFavorite = () => {
   if (item.value) {
-    userStore.toggleFavorite(item.value.id);
+    userStore.toggleFavorite(item.value.id)
   }
-};
+}
 
 const handleImageError = (e: Event) => {
-  const img = e.target as HTMLImageElement;
-  img.style.display = 'none';
-};
+  const img = e.target as HTMLImageElement
+  img.style.display = 'none'
+}
 
 onMounted(() => {
-  loadData();
-});
+  loadData()
+})
 
-watch(() => props.id, () => {
-  if (items.value.length === 0) {
-    loadData();
+watch(
+  () => props.id,
+  () => {
+    if (items.value.length === 0) {
+      loadData()
+    }
   }
-});
+)
 </script>
 
 <style scoped lang="scss">
@@ -219,7 +226,9 @@ watch(() => props.id, () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // 原版风格
@@ -240,13 +249,19 @@ watch(() => props.id, () => {
   background: #111;
   padding: 3em 2em;
   margin: 1em 0 2em;
-  box-shadow: inset 0 0 .3em .1em #531;
-  font: 18px/1.5 '仿宋', 'SimSun', serif;
+  box-shadow: inset 0 0 0.3em 0.1em #531;
+  font:
+    18px/1.5 '仿宋',
+    'SimSun',
+    serif;
   color: #ccc;
   position: relative;
 
   @media (max-width: 1000px) {
-    font: 12px/1.5 '仿宋', 'SimSun', serif;
+    font:
+      12px/1.5 '仿宋',
+      'SimSun',
+      serif;
     margin: 0 0 2em;
   }
 }
@@ -292,7 +307,7 @@ watch(() => props.id, () => {
 .left-icon {
   flex-shrink: 0;
   width: 150px;
-  
+
   img {
     width: 100%;
     height: auto;
@@ -316,7 +331,7 @@ watch(() => props.id, () => {
   :deep(p) {
     margin: 0;
     padding: 0.5em 0;
-    
+
     &:not(:last-child) {
       border-bottom: 1px solid #321;
     }

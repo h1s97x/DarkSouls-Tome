@@ -4,42 +4,54 @@
     <div class="icon">
       <LazyImage :src="iconPath" :alt="item.name.chn" />
     </div>
-    
+
     <!-- 中文 -->
     <div class="chn">
       <div class="name">{{ item.name.chn }}</div>
       <div class="desc">
         <div class="desfrm">
-          <p v-for="(line, index) in formatDescription(item.description.chn)" :key="index" v-html="line"></p>
+          <p
+            v-for="(line, index) in formatDescription(item.description.chn)"
+            :key="index"
+            v-html="line"
+          ></p>
         </div>
       </div>
-      <div class="remk" v-if="item.remark?.chn">
+      <div v-if="item.remark?.chn" class="remk">
         <p v-html="formatText(item.remark.chn)"></p>
       </div>
     </div>
-    
+
     <!-- 日文 -->
     <div class="jap">
       <div class="name">{{ item.name.jap }}</div>
       <div class="desc">
         <div class="desfrm">
-          <p v-for="(line, index) in formatDescription(item.description.jap)" :key="index" v-html="line"></p>
+          <p
+            v-for="(line, index) in formatDescription(item.description.jap)"
+            :key="index"
+            v-html="line"
+          ></p>
         </div>
       </div>
-      <div class="remk" v-if="item.remark?.jap">
+      <div v-if="item.remark?.jap" class="remk">
         <p v-html="formatText(item.remark.jap)"></p>
       </div>
     </div>
-    
+
     <!-- 英文 -->
     <div class="eng">
       <div class="name">{{ item.name.eng }}</div>
       <div class="desc">
         <div class="desfrm">
-          <p v-for="(line, index) in formatDescription(item.description.eng)" :key="index" v-html="line"></p>
+          <p
+            v-for="(line, index) in formatDescription(item.description.eng)"
+            :key="index"
+            v-html="line"
+          ></p>
         </div>
       </div>
-      <div class="remk" v-if="item.remark?.eng">
+      <div v-if="item.remark?.eng" class="remk">
         <p v-html="formatText(item.remark.eng)"></p>
       </div>
     </div>
@@ -54,30 +66,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { formatGameText } from '@/utils/formatter';
-import LazyImage from '@/components/common/LazyImage.vue';
-import type { Item } from '@/types/item';
+import { ref, computed } from 'vue'
+import { formatGameText } from '@/utils/formatter'
+import LazyImage from '@/components/common/LazyImage.vue'
+import type { Item } from '@/types/item'
 
 const props = defineProps<{
-  item: Item;
-}>();
+  item: Item
+}>()
 
-const currentLang = ref('c'); // c=中文, j=日文, e=英文
+const currentLang = ref('c') // c=中文, j=日文, e=英文
 
-const langClass = computed(() => `frame ${currentLang.value}`);
+const langClass = computed(() => `frame ${currentLang.value}`)
 
-const iconPath = computed(() => `/icons/${props.item.icon}`);
+const iconPath = computed(() => `/icons/${props.item.icon}`)
 
 const formatText = (text: string) => {
-  return formatGameText(text || '');
-};
+  return formatGameText(text || '')
+}
 
 const formatDescription = (text: string) => {
-  if (!text) return [''];
-  const formatted = formatGameText(text);
-  return formatted.split('<br>').filter(line => line.trim());
-};
+  if (!text) return ['']
+  const formatted = formatGameText(text)
+  return formatted.split('<br>').filter((line) => line.trim())
+}
 </script>
 
 <style scoped lang="scss">
@@ -99,7 +111,9 @@ const formatDescription = (text: string) => {
   }
 }
 
-.chn, .jap, .eng {
+.chn,
+.jap,
+.eng {
   float: left;
   width: 28%;
   padding: 1%;
@@ -120,13 +134,13 @@ const formatDescription = (text: string) => {
 .desc {
   border-bottom: 1px solid #430;
   height: 24em;
-  padding: .25em 0;
+  padding: 0.25em 0;
 }
 
 .remk {
   border-bottom: 1px solid #430;
   height: 3em;
-  padding: .25em 0;
+  padding: 0.25em 0;
 
   p {
     transform: translateY(-50%);
@@ -156,7 +170,10 @@ const formatDescription = (text: string) => {
 // 移动端适配
 @media screen and (max-width: 1000px) {
   .classic-item-card {
-    font: 8px/1.5 仿宋, SimSun, serif;
+    font:
+      8px/1.5 仿宋,
+      SimSun,
+      serif;
     margin: 0 0 10em;
   }
 
@@ -172,7 +189,9 @@ const formatDescription = (text: string) => {
     }
   }
 
-  .chn, .jap, .eng {
+  .chn,
+  .jap,
+  .eng {
     width: 33% !important;
     padding: 5% 0;
     z-index: 1;
@@ -196,10 +215,13 @@ const formatDescription = (text: string) => {
     margin: 0;
   }
 
-  .name, .desc, .remk, .desfrm {
+  .name,
+  .desc,
+  .remk,
+  .desfrm {
     width: 300%;
     opacity: 0;
-    transition: .3s;
+    transition: 0.3s;
   }
 
   .frame.c .chn,
@@ -226,14 +248,14 @@ const formatDescription = (text: string) => {
     margin: 2em;
     line-height: 2;
     border: 1px solid #430;
-    transition: .3s;
+    transition: 0.3s;
     overflow: hidden;
 
     .tab {
       float: left;
       width: 33.33%;
       cursor: pointer;
-      transition: .3s;
+      transition: 0.3s;
 
       &:hover {
         background: rgba(153, 102, 0, 0.3);

@@ -29,7 +29,11 @@
               class="npc-card"
             >
               <div class="npc-icon">
-                <img :src="`/icons/dialogue${game}/${npc}.webp`" :alt="npc" @error="handleImageError">
+                <img
+                  :src="`/icons/dialogue${game}/${npc}.webp`"
+                  :alt="npc"
+                  @error="handleImageError"
+                />
               </div>
               <div class="npc-name">{{ npc }}</div>
             </router-link>
@@ -41,80 +45,200 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { GAME_NAMES } from '@/utils/constants';
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue';
-import SidebarNav from '@/components/layout/SidebarNav.vue';
-import type { GameVersion } from '@/types/item';
+import { ref, computed, onMounted } from 'vue'
+import { GAME_NAMES } from '@/utils/constants'
+import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
+import SidebarNav from '@/components/layout/SidebarNav.vue'
+import type { GameVersion } from '@/types/item'
 
 const props = defineProps<{
-  game: string;
-}>();
+  game: string
+}>()
 
-const npcList = ref<string[]>([]);
-const loading = ref(false);
-const error = ref<string | null>(null);
+const npcList = ref<string[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
 
-const gameNum = computed(() => Number(props.game) as GameVersion);
+const gameNum = computed(() => Number(props.game) as GameVersion)
 
 const title = computed(() => {
-  return `${GAME_NAMES[gameNum.value]} - NPC对话`;
-});
+  return `${GAME_NAMES[gameNum.value]} - NPC对话`
+})
 
 // NPC 列表（根据实际数据文件）
 const npcLists: Record<number, string[]> = {
   1: [
-    'alvina', 'anastacia', 'andre', 'artorias', 'aside', 'chester', 'ciaran',
-    'crestfallen', 'darkmoon', 'domhnall', 'dusk', 'eingyi', 'elizabeth',
-    'fortressknight', 'frampt', 'giantsmith', 'gough', 'griggs', 'gwyndolin',
-    'gwynevere', 'ingward', 'kaathe', 'laurentius', 'lautrec', 'logan',
-    'nest', 'nico', 'oscar', 'oswald', 'patches', 'petrus', 'quelana',
-    'quelaag', 'reah', 'rhea', 'rickert', 'shiva', 'sieglinde', 'siegmeyer',
-    'solaire', 'undead', 'vamos', 'velka', 'vince', 'witch', 'yulia'
+    'alvina',
+    'anastacia',
+    'andre',
+    'artorias',
+    'aside',
+    'chester',
+    'ciaran',
+    'crestfallen',
+    'darkmoon',
+    'domhnall',
+    'dusk',
+    'eingyi',
+    'elizabeth',
+    'fortressknight',
+    'frampt',
+    'giantsmith',
+    'gough',
+    'griggs',
+    'gwyndolin',
+    'gwynevere',
+    'ingward',
+    'kaathe',
+    'laurentius',
+    'lautrec',
+    'logan',
+    'nest',
+    'nico',
+    'oscar',
+    'oswald',
+    'patches',
+    'petrus',
+    'quelana',
+    'quelaag',
+    'reah',
+    'rhea',
+    'rickert',
+    'shiva',
+    'sieglinde',
+    'siegmeyer',
+    'solaire',
+    'undead',
+    'vamos',
+    'velka',
+    'vince',
+    'witch',
+    'yulia'
   ],
   2: [
-    'agdayne', 'aldia', 'alsanna', 'ancient', 'ashen', 'aslatiel', 'bashful',
-    'bell', 'benhart', 'blacksmith', 'blue', 'bradley', 'cale', 'carhillion',
-    'cat', 'chancellor', 'chloanne', 'creighton', 'cromwell', 'darkdiver',
-    'drummond', 'dull', 'emerald', 'felkin', 'fencer', 'forlorn', 'galvan',
-    'gavlan', 'gilligan', 'grave', 'head', 'jester', 'laddersmith', 'lenigrast',
-    'lonesome', 'lucatiel', 'magerold', 'maughlin', 'melinda', 'merchant',
-    'mild', 'milibeth', 'nashandra', 'navlaan', 'ornifex', 'pate', 'pilgrim',
-    'rosabeth', 'royal', 'saulden', 'shanalotte', 'steady', 'stone', 'straid',
-    'sweet', 'titchy', 'vendrick', 'weaponsmith'
+    'agdayne',
+    'aldia',
+    'alsanna',
+    'ancient',
+    'ashen',
+    'aslatiel',
+    'bashful',
+    'bell',
+    'benhart',
+    'blacksmith',
+    'blue',
+    'bradley',
+    'cale',
+    'carhillion',
+    'cat',
+    'chancellor',
+    'chloanne',
+    'creighton',
+    'cromwell',
+    'darkdiver',
+    'drummond',
+    'dull',
+    'emerald',
+    'felkin',
+    'fencer',
+    'forlorn',
+    'galvan',
+    'gavlan',
+    'gilligan',
+    'grave',
+    'head',
+    'jester',
+    'laddersmith',
+    'lenigrast',
+    'lonesome',
+    'lucatiel',
+    'magerold',
+    'maughlin',
+    'melinda',
+    'merchant',
+    'mild',
+    'milibeth',
+    'nashandra',
+    'navlaan',
+    'ornifex',
+    'pate',
+    'pilgrim',
+    'rosabeth',
+    'royal',
+    'saulden',
+    'shanalotte',
+    'steady',
+    'stone',
+    'straid',
+    'sweet',
+    'titchy',
+    'vendrick',
+    'weaponsmith'
   ],
   3: [
-    'andre', 'anri', 'archdeacon', 'blacksmith', 'cornyx', 'corvian', 'daughter',
-    'eygon', 'firekeeper', 'giant', 'greirat', 'handmaid', 'hawkwood', 'horace',
-    'irina', 'karla', 'knight', 'lapp', 'leonhard', 'locust', 'londor', 'ludleth',
-    'orbeck', 'painter', 'patches', 'pilgrim', 'ringfinger', 'rosaria', 'shira',
-    'shrine', 'siegward', 'sirris', 'slave', 'stone', 'unbreakable', 'velka',
-    'yoel', 'yuria'
+    'andre',
+    'anri',
+    'archdeacon',
+    'blacksmith',
+    'cornyx',
+    'corvian',
+    'daughter',
+    'eygon',
+    'firekeeper',
+    'giant',
+    'greirat',
+    'handmaid',
+    'hawkwood',
+    'horace',
+    'irina',
+    'karla',
+    'knight',
+    'lapp',
+    'leonhard',
+    'locust',
+    'londor',
+    'ludleth',
+    'orbeck',
+    'painter',
+    'patches',
+    'pilgrim',
+    'ringfinger',
+    'rosaria',
+    'shira',
+    'shrine',
+    'siegward',
+    'sirris',
+    'slave',
+    'stone',
+    'unbreakable',
+    'velka',
+    'yoel',
+    'yuria'
   ]
-};
+}
 
 const loadNPCList = () => {
-  loading.value = true;
-  error.value = null;
+  loading.value = true
+  error.value = null
 
   try {
-    npcList.value = npcLists[gameNum.value] || [];
+    npcList.value = npcLists[gameNum.value] || []
   } catch (e) {
-    error.value = '加载NPC列表失败';
-    console.error('Failed to load NPC list:', e);
+    error.value = '加载NPC列表失败'
+    console.error('Failed to load NPC list:', e)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const handleImageError = (e: Event) => {
-  const img = e.target as HTMLImageElement;
-  img.style.display = 'none';
-};
+  const img = e.target as HTMLImageElement
+  img.style.display = 'none'
+}
 
 onMounted(() => {
-  loadNPCList();
-});
+  loadNPCList()
+})
 </script>
 
 <style scoped lang="scss">
@@ -185,7 +309,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .npc-grid {
@@ -208,12 +334,14 @@ onMounted(() => {
   border: 1px solid #430;
   transition: 0.3s;
   text-decoration: none;
-  box-shadow: inset 0 0 .3em .1em #531;
+  box-shadow: inset 0 0 0.3em 0.1em #531;
 
   &:hover {
     border-color: #960;
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(153, 102, 0, 0.3), inset 0 0 .3em .1em #531;
+    box-shadow:
+      0 4px 12px rgba(153, 102, 0, 0.3),
+      inset 0 0 0.3em 0.1em #531;
   }
 
   .npc-icon {

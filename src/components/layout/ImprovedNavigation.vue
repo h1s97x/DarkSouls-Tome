@@ -7,10 +7,10 @@
           <span class="logo-text">黑魂数据库</span>
           <span class="logo-subtitle">Dark Souls DB</span>
         </router-link>
-        
+
         <div class="game-switcher">
-          <button 
-            v-for="game in games" 
+          <button
+            v-for="game in games"
             :key="game.id"
             :class="['game-btn', { active: currentGame === game.id }]"
             @click="switchGame(game.id)"
@@ -22,8 +22,8 @@
 
       <!-- 分类导航 -->
       <nav class="nav-categories">
-        <router-link 
-          v-for="category in categories" 
+        <router-link
+          v-for="category in categories"
           :key="category.type"
           :to="`/ds${currentGame}/${category.type}`"
           class="category-link"
@@ -32,7 +32,7 @@
           <span class="category-name">{{ category.name }}</span>
           <span class="category-name-en">{{ category.nameEn }}</span>
         </router-link>
-        
+
         <router-link to="/favorites" class="category-link">
           <span class="category-icon">★</span>
           <span class="category-name">收藏</span>
@@ -41,12 +41,12 @@
 
         <!-- 语言切换 -->
         <div class="language-selector">
-          <button 
-            v-for="lang in languages" 
+          <button
+            v-for="lang in languages"
             :key="lang.value"
             :class="['lang-btn', { active: currentLanguage === lang.value }]"
-            @click="setLanguage(lang.value)"
             :title="lang.label"
+            @click="setLanguage(lang.value)"
           >
             {{ lang.short }}
           </button>
@@ -64,19 +64,19 @@
     <!-- 移动端菜单 -->
     <div v-if="mobileMenuOpen" class="mobile-menu">
       <div class="mobile-game-switcher">
-        <button 
-          v-for="game in games" 
+        <button
+          v-for="game in games"
           :key="game.id"
           :class="['mobile-game-btn', { active: currentGame === game.id }]"
-          @click="switchGame(game.id); closeMobileMenu()"
+          @click="switchGameAndClose(game.id)"
         >
           {{ game.name }}
         </button>
       </div>
-      
+
       <nav class="mobile-categories">
-        <router-link 
-          v-for="category in categories" 
+        <router-link
+          v-for="category in categories"
           :key="category.type"
           :to="`/ds${currentGame}/${category.type}`"
           class="mobile-category-link"
@@ -85,7 +85,7 @@
           <span class="category-icon">{{ category.icon }}</span>
           <span>{{ category.name }} / {{ category.nameEn }}</span>
         </router-link>
-        
+
         <router-link to="/favorites" class="mobile-category-link" @click="closeMobileMenu">
           <span class="category-icon">★</span>
           <span>收藏 / Favorites</span>
@@ -94,8 +94,8 @@
         <!-- 移动端语言切换 -->
         <div class="mobile-language-selector">
           <span class="lang-label">语言 / Language:</span>
-          <button 
-            v-for="lang in languages" 
+          <button
+            v-for="lang in languages"
             :key="lang.value"
             :class="['mobile-lang-btn', { active: currentLanguage === lang.value }]"
             @click="setLanguage(lang.value)"
@@ -109,20 +109,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
-import type { Language } from '@/types/item';
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import type { Language } from '@/types/item'
 
-const route = useRoute();
-const router = useRouter();
-const userStore = useUserStore();
+const route = useRoute()
+const router = useRouter()
+const userStore = useUserStore()
 
 const games = [
   { id: 1, name: '黑魂1' },
   { id: 2, name: '黑魂2' },
   { id: 3, name: '黑魂3' }
-];
+]
 
 const categories = [
   { type: 'weapon', name: '武器', nameEn: 'Weapons', icon: '⚔️' },
@@ -131,61 +131,66 @@ const categories = [
   { type: 'item', name: '物品', nameEn: 'Items', icon: '📦' },
   { type: 'magic', name: '法术', nameEn: 'Magic', icon: '✨' },
   { type: 'dialogue', name: '对话', nameEn: 'Dialogue', icon: '💬' }
-];
+]
 
 const languages = [
   { value: 'chn' as Language, label: '中文', short: '中' },
   { value: 'jap' as Language, label: '日本語', short: '日' },
   { value: 'eng' as Language, label: 'English', short: 'EN' }
-];
+]
 
 const currentGame = computed(() => {
-  const match = route.path.match(/\/ds(\d)/);
-  return match ? Number(match[1]) : 1;
-});
+  const match = route.path.match(/\/ds(\d)/)
+  return match ? Number(match[1]) : 1
+})
 
-const currentLanguage = computed(() => userStore.currentLanguage);
+const currentLanguage = computed(() => userStore.currentLanguage)
 
-const mobileMenuOpen = ref(false);
-const isScrolled = ref(false);
+const mobileMenuOpen = ref(false)
+const isScrolled = ref(false)
 
 const switchGame = (gameId: number) => {
-  const currentType = route.params.type;
+  const currentType = route.params.type
   if (currentType) {
-    router.push(`/ds${gameId}/${currentType}`);
+    router.push(`/ds${gameId}/${currentType}`)
   }
-};
+}
+
+const switchGameAndClose = (gameId: number) => {
+  switchGame(gameId)
+  closeMobileMenu()
+}
 
 const setLanguage = (lang: Language) => {
-  userStore.setLanguage(lang);
-};
+  userStore.setLanguage(lang)
+}
 
 const toggleMobileMenu = () => {
-  mobileMenuOpen.value = !mobileMenuOpen.value;
-};
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
 
 const closeMobileMenu = () => {
-  mobileMenuOpen.value = false;
-};
+  mobileMenuOpen.value = false
+}
 
 const handleScroll = () => {
-  isScrolled.value = window.scrollY > 50;
+  isScrolled.value = window.scrollY > 50
   // 给 body 添加/移除 class 以调整页面布局
   if (isScrolled.value) {
-    document.body.classList.add('nav-scrolled');
+    document.body.classList.add('nav-scrolled')
   } else {
-    document.body.classList.remove('nav-scrolled');
+    document.body.classList.remove('nav-scrolled')
   }
-};
+}
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
-});
+  window.addEventListener('scroll', handleScroll)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-  document.body.classList.remove('nav-scrolled');
-});
+  window.removeEventListener('scroll', handleScroll)
+  document.body.classList.remove('nav-scrolled')
+})
 </script>
 
 <style scoped lang="scss">

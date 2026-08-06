@@ -1,21 +1,21 @@
 <template>
   <div class="classic-home">
     <ImprovedNavigation />
-    <hr>
+    <hr />
     <ClassicContainer>
       <div class="splash-container desktop">
-        <img src="/splash.webp" alt="黑暗之魂系列文本数据库">
+        <img src="/splash.webp" alt="黑暗之魂系列文本数据库" />
       </div>
       <div class="splash-container mobile">
-        <img src="/splash2.webp" alt="黑魂数据库">
+        <img src="/splash2.webp" alt="黑魂数据库" />
       </div>
     </ClassicContainer>
   </div>
 </template>
 
 <script setup lang="ts">
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue';
-import ClassicContainer from '@/components/layout/ClassicContainer.vue';
+import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
+import ClassicContainer from '@/components/layout/ClassicContainer.vue'
 </script>
 
 <style scoped lang="scss">

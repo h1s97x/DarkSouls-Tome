@@ -61,20 +61,20 @@ export default defineConfig({
           // 核心框架
           if (id.includes('node_modules')) {
             if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
-              return 'vendor';
+              return 'vendor'
             }
-            return 'libs';
+            return 'libs'
           }
-          
+
           // 游戏数据按游戏分割
           if (id.includes('/data/ds1/')) {
-            return 'data-ds1';
+            return 'data-ds1'
           }
           if (id.includes('/data/ds2/')) {
-            return 'data-ds2';
+            return 'data-ds2'
           }
           if (id.includes('/data/ds3/')) {
-            return 'data-ds3';
+            return 'data-ds3'
           }
         },
         chunkFileNames: 'assets/[name]-[hash].js',
