@@ -65,7 +65,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Comment on commit
-        uses: peter-evans/commit-comment@v3
+        uses: peter-evans/commit-comment@v4
         with:
           body: |
             🚀 Successfully deployed to GitHub Pages!
