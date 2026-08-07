@@ -2,6 +2,5 @@ dist
 node_modules
 public
 docs
-scripts
 src/data
 package-lock.json

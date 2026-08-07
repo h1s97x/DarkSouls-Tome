@@ -8,7 +8,7 @@ import pluginPrettier from 'eslint-plugin-prettier'
 export default [
   // 全局忽略
   {
-    ignores: ['dist/**', 'node_modules/**', 'public/**', 'docs/**', 'scripts/**']
+    ignores: ['dist/**', 'node_modules/**', 'public/**', 'docs/**']
   },
 
   // JS / TS 基础规则

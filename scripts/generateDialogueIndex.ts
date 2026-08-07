@@ -6,17 +6,19 @@
  *
  * 用法：npm run generate:dialogue-index
  */
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const games = [1, 2, 3]
+const games = [1, 2, 3] as const
+
+type DialogueIndex = Record<number, string[]>
 
 function buildIndex() {
-  const index = {}
+  const index = {} as DialogueIndex
   for (const game of games) {
     const dialogueDir = path.join(__dirname, `../src/data/ds${game}/dialogues`)
     if (!fs.existsSync(dialogueDir)) {

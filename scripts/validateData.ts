@@ -14,62 +14,77 @@ import { dialogueIndexSchema, dialogueSchema, itemArraySchema } from '../src/ser
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 /** 统计异常并打印，供排查 */
-const issues = []
+const issues: string[] = []
+
+const games = [1, 2, 3] as const
+const itemTypes = ['weapon', 'armor', 'ring', 'item', 'magic'] as const
 
 /** 校验物品数据文件 */
-function validateItemsFile(game) {
-  for (const type of ['weapon', 'armor', 'ring', 'item', 'magic']) {
-    const path = join(root, `src/data/ds${game}/${type}s.json`)
+function validateItemsFile(game: (typeof games)[number]) {
+  for (const type of itemTypes) {
+    const filePath = join(root, `src/data/ds${game}/${type}s.json`)
     try {
-      const raw = JSON.parse(readFileSync(path, 'utf8'))
+      const raw: unknown = JSON.parse(readFileSync(filePath, 'utf8'))
       const result = itemArraySchema.safeParse(raw)
       if (!result.success) {
         for (const issue of result.error.issues) {
-          issues.push(`[items] ds${game}/${type}s.json → ${issue.path.join('.') || '(root)'}: ${issue.message}`)
+          issues.push(
+            `[items] ds${game}/${type}s.json → ${issue.path.join('.') || '(root)'}: ${issue.message}`
+          )
         }
       }
     } catch (e) {
-      issues.push(`[items] ds${game}/${type}s.json 读取/解析失败: ${e.message}`)
+      issues.push(
+        `[items] ds${game}/${type}s.json 读取/解析失败: ${e instanceof Error ? e.message : String(e)}`
+      )
     }
   }
 }
 
 /** 校验对话数据文件 */
-function validateDialoguesFile(game) {
+function validateDialoguesFile(game: (typeof games)[number]) {
   const dir = join(root, `src/data/ds${game}/dialogues`)
   for (const file of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
-    const path = join(dir, file)
+    const filePath = join(dir, file)
     try {
-      const raw = JSON.parse(readFileSync(path, 'utf8'))
+      const raw: unknown = JSON.parse(readFileSync(filePath, 'utf8'))
       const result = dialogueSchema.safeParse(raw)
       if (!result.success) {
         for (const issue of result.error.issues) {
-          issues.push(`[dialogue] ds${game}/dialogues/${file} → ${issue.path.join('.') || '(root)'}: ${issue.message}`)
+          issues.push(
+            `[dialogue] ds${game}/dialogues/${file} → ${issue.path.join('.') || '(root)'}: ${issue.message}`
+          )
         }
       }
     } catch (e) {
-      issues.push(`[dialogue] ds${game}/dialogues/${file} 读取/解析失败: ${e.message}`)
+      issues.push(
+        `[dialogue] ds${game}/dialogues/${file} 读取/解析失败: ${e instanceof Error ? e.message : String(e)}`
+      )
     }
   }
 }
 
 /** 校验 NPC 索引 */
 function validateDialogueIndex() {
-  const path = join(root, 'src/data/dialogueIndex.json')
+  const filePath = join(root, 'src/data/dialogueIndex.json')
   try {
-    const raw = JSON.parse(readFileSync(path, 'utf8'))
+    const raw: unknown = JSON.parse(readFileSync(filePath, 'utf8'))
     const result = dialogueIndexSchema.safeParse(raw)
     if (!result.success) {
       for (const issue of result.error.issues) {
-        issues.push(`[index] dialogueIndex.json → ${issue.path.join('.') || '(root)'}: ${issue.message}`)
+        issues.push(
+          `[index] dialogueIndex.json → ${issue.path.join('.') || '(root)'}: ${issue.message}`
+        )
       }
     }
   } catch (e) {
-    issues.push(`[index] dialogueIndex.json 读取/解析失败: ${e.message}`)
+    issues.push(
+      `[index] dialogueIndex.json 读取/解析失败: ${e instanceof Error ? e.message : String(e)}`
+    )
   }
 }
 
-for (const game of [1, 2, 3]) {
+for (const game of games) {
   validateItemsFile(game)
   validateDialoguesFile(game)
 }

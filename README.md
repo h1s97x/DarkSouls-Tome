@@ -57,9 +57,12 @@ cd darksouls-tome
 # 安装依赖
 npm install
 
-# 数据迁移（首次运行）
+# 数据迁移（首次运行，需先放置原始 XML 到 reference/ 目录）
 npm run convert-data
 ```
+
+> ⚠️ `convert-data` 依赖 `reference/` 下的原始 XML 数据（已被 git 忽略，仅本地持有）。
+> 目录缺失时脚本会直接报错中止，不会覆盖 `src/data/` 中的生产数据。
 
 ### 开发
 
@@ -103,7 +106,7 @@ DarkSouls-Tome/
 │   └── data/              # 游戏数据（JSON）
 ├── public/                # 公共资源
 │   └── icons/             # 游戏图标
-└── scripts/               # 构建脚本
+└── scripts/               # 构建脚本（TypeScript，node --experimental-strip-types 直接运行）
 ```
 
 ## 🛠️ 技术栈
