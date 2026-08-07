@@ -1,62 +1,56 @@
 <template>
-  <div class="favorite-view">
-    <ImprovedNavigation />
-    <div class="favorite-layout">
-      <SidebarNav />
-      <main class="favorite-main">
-        <div class="favorite-container">
-          <h2 class="page-title">我的收藏</h2>
+  <WikiLayout>
+    <h2 class="page-title">我的收藏</h2>
 
-          <div v-if="loading" class="loading">
-            <div class="loading-spinner"></div>
-            <p>加载中...</p>
-          </div>
-
-          <div v-else-if="favoriteItems.length === 0" class="empty">
-            <p class="empty-icon">📌</p>
-            <p>还没有收藏任何物品</p>
-            <router-link to="/ds1/weapon" class="browse-link">去浏览物品</router-link>
-          </div>
-
-          <div v-else class="favorites-content">
-            <div class="favorites-header">
-              <p class="item-count">共 {{ favoriteItems.length }} 项收藏</p>
-              <button class="clear-btn" @click="clearAll">清空收藏</button>
-            </div>
-
-            <table class="favorites-table">
-              <thead>
-                <tr>
-                  <th class="icon-col">图标</th>
-                  <th class="name-col">名称</th>
-                  <th class="game-col">游戏</th>
-                  <th class="type-col">类型</th>
-                  <th class="action-col">操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in favoriteItems" :key="itemKey(item)" class="table-row">
-                  <td class="icon-cell">
-                    <img :src="`/icons/${item.icon}`" :alt="item.name.chn" />
-                  </td>
-                  <td class="name-cell">
-                    <router-link :to="getItemLink(item)" class="item-link">
-                      {{ item.name.chn }}
-                    </router-link>
-                  </td>
-                  <td class="game-cell">{{ getGameName(item) }}</td>
-                  <td class="type-cell">{{ getTypeName(item) }}</td>
-                  <td class="action-cell">
-                    <button class="remove-btn" @click="removeFavorite(item)">移除</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </main>
+    <div v-if="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>加载中...</p>
     </div>
-  </div>
+
+    <div v-else-if="favoriteItems.length === 0" class="empty">
+      <p class="empty-icon">📌</p>
+      <p>还没有收藏任何物品</p>
+      <router-link to="/ds1/weapon" class="browse-link">去浏览物品</router-link>
+    </div>
+
+    <div v-else class="favorites-content">
+      <div class="favorites-header">
+        <p class="item-count">共 {{ favoriteItems.length }} 项收藏</p>
+        <button class="clear-btn" @click="clearAll">清空收藏</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="favorites-table">
+          <thead>
+            <tr>
+              <th class="icon-col">图标</th>
+              <th class="name-col">名称</th>
+              <th class="game-col">游戏</th>
+              <th class="type-col">类型</th>
+              <th class="action-col">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in favoriteItems" :key="itemKey(item)" class="table-row">
+              <td class="icon-cell">
+                <img :src="`/icons/${item.icon}`" :alt="item.name.chn" />
+              </td>
+              <td class="name-cell">
+                <router-link :to="getItemLink(item)" class="item-link">
+                  {{ item.name.chn }}
+                </router-link>
+              </td>
+              <td class="game-cell">{{ getGameName(item) }}</td>
+              <td class="type-cell">{{ getTypeName(item) }}</td>
+              <td class="action-cell">
+                <button class="remove-btn" @click="removeFavorite(item)">移除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </WikiLayout>
 </template>
 
 <script setup lang="ts">
@@ -64,8 +58,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { GAME_NAMES, ITEM_TYPE_NAMES } from '@/utils/constants'
 import { dataService, itemKey } from '@/services/dataService'
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
-import SidebarNav from '@/components/layout/SidebarNav.vue'
+import WikiLayout from '@/components/layout/WikiLayout.vue'
 import type { Item } from '@/types/item'
 
 const userStore = useUserStore()
@@ -119,44 +112,14 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.favorite-view {
-  min-height: 100vh;
-  background: #000;
-}
-
-.favorite-layout {
-  display: flex;
-  padding-top: var(--nav-height, 110px);
-  transition: padding-top 0.3s ease;
-
-  @media (max-width: 1000px) {
-    padding-top: var(--nav-height-mobile, 95px);
-  }
-}
-
-.favorite-main {
-  flex: 1;
-  min-width: 0;
-}
-
-.favorite-container {
-  padding: 2em;
-  max-width: 1400px;
-  margin: 0 auto;
-
-  @media (max-width: 1000px) {
-    padding: 1em;
-  }
-}
-
 .page-title {
-  color: #960;
-  font-size: 1.8em;
-  margin: 0 0 1.5em 0;
-  font-family: '仿宋', 'SimSun', serif;
+  color: var(--color-text);
+  font-size: 1.7em;
+  font-weight: 700;
+  margin: 0 0 1.25em;
 
-  @media (max-width: 1000px) {
-    font-size: 1.4em;
+  @media (max-width: 768px) {
+    font-size: 1.3em;
   }
 }
 
@@ -164,8 +127,7 @@ onMounted(() => {
 .empty {
   text-align: center;
   padding: 4em 2em;
-  color: #ccc;
-  font-family: '仿宋', 'SimSun', serif;
+  color: var(--color-text-secondary);
 
   .loading-spinner {
     margin: 0 auto 1em;
@@ -180,26 +142,26 @@ onMounted(() => {
     display: inline-block;
     margin-top: 2rem;
     padding: 0.75em 1.5em;
-    background: #111;
-    border: 1px solid #430;
-    color: #960;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-accent);
     text-decoration: none;
-    transition: 0.3s;
-    font-family: '仿宋', 'SimSun', serif;
 
     &:hover {
-      border-color: #960;
-      background: #222;
+      border-color: var(--color-accent);
     }
   }
 }
 
 .favorites-content {
-  background: #111;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
   padding: 1.5em;
-  box-shadow: inset 0 0 0.3em 0.1em #531;
 
-  @media (max-width: 1000px) {
+  @media (max-width: 768px) {
     padding: 1em;
   }
 }
@@ -208,30 +170,32 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5em;
-  padding-bottom: 1em;
-  border-bottom: 1px solid #430;
+  margin-bottom: 1.25em;
 
   .item-count {
-    color: #aaa;
+    color: var(--color-text-muted);
     font-size: 0.95em;
     margin: 0;
   }
 
   .clear-btn {
-    padding: 0.5em 1.5em;
-    background: #222;
-    border: 1px solid #430;
-    color: #f66;
+    padding: 0.45em 1.2em;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-red);
     cursor: pointer;
-    transition: 0.3s;
-    font-family: '仿宋', 'SimSun', serif;
 
     &:hover {
-      border-color: #f66;
-      background: #333;
+      border-color: var(--color-red);
     }
   }
+}
+
+.table-wrapper {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .favorites-table {
@@ -239,27 +203,27 @@ onMounted(() => {
   border-collapse: collapse;
 
   thead {
-    background: #222;
+    background: var(--color-bg-tertiary);
 
     th {
-      padding: 1em;
+      padding: 0.85em 1em;
       text-align: left;
-      color: #960;
-      border-bottom: 2px solid #430;
+      color: var(--color-text-secondary);
+      border-bottom: 2px solid var(--color-border);
       font-weight: 700;
-      font-family: '仿宋', 'SimSun', serif;
+      font-size: 0.9em;
 
-      @media (max-width: 1000px) {
-        padding: 0.75em 0.5em;
-        font-size: 0.9em;
+      @media (max-width: 768px) {
+        padding: 0.7em 0.6em;
+        font-size: 0.85em;
       }
     }
 
     .icon-col {
-      width: 80px;
+      width: 64px;
 
-      @media (max-width: 1000px) {
-        width: 60px;
+      @media (max-width: 768px) {
+        width: 52px;
       }
     }
 
@@ -277,18 +241,18 @@ onMounted(() => {
     }
 
     .action-col {
-      width: 100px;
+      width: 90px;
       text-align: center;
     }
   }
 
   tbody {
     tr {
-      border-bottom: 1px solid #321;
-      transition: 0.3s;
+      border-bottom: 1px solid var(--color-border-light);
+      transition: background 0.2s;
 
       &:hover {
-        background: rgba(153, 102, 0, 0.1);
+        background: var(--color-bg-hover);
       }
 
       &:last-child {
@@ -297,38 +261,36 @@ onMounted(() => {
     }
 
     td {
-      padding: 1em;
-      color: #ccc;
+      padding: 0.8em 1em;
+      color: var(--color-text);
       vertical-align: middle;
 
-      @media (max-width: 1000px) {
-        padding: 0.75em 0.5em;
+      @media (max-width: 768px) {
+        padding: 0.65em 0.6em;
       }
     }
 
     .icon-cell {
       img {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         object-fit: contain;
         display: block;
 
-        @media (max-width: 1000px) {
-          width: 40px;
-          height: 40px;
+        @media (max-width: 768px) {
+          width: 38px;
+          height: 38px;
         }
       }
     }
 
     .name-cell {
       .item-link {
-        color: #fe6;
-        font-weight: 700;
-        font-family: '仿宋', 'SimSun', serif;
-        transition: 0.3s;
+        color: var(--color-link);
+        font-weight: 600;
 
         &:hover {
-          color: #960;
+          color: var(--color-link-hover);
           text-decoration: underline;
         }
       }
@@ -336,8 +298,8 @@ onMounted(() => {
 
     .game-cell,
     .type-cell {
-      color: #aaa;
-      font-size: 0.95em;
+      color: var(--color-text-secondary);
+      font-size: 0.92em;
 
       @media (max-width: 768px) {
         display: none;
@@ -348,18 +310,17 @@ onMounted(() => {
       text-align: center;
 
       .remove-btn {
-        padding: 0.4em 1em;
+        padding: 0.35em 1em;
         background: transparent;
-        border: 1px solid #430;
-        color: #f66;
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        color: var(--color-red);
         cursor: pointer;
-        transition: 0.3s;
-        font-family: '仿宋', 'SimSun', serif;
-        font-size: 0.9em;
+        font-size: 0.88em;
 
         &:hover {
-          border-color: #f66;
-          background: rgba(255, 102, 102, 0.1);
+          border-color: var(--color-red);
+          background: rgba(192, 57, 43, 0.08);
         }
       }
     }

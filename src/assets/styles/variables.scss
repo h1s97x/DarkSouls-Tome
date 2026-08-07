@@ -3,42 +3,94 @@ $breakpoint-mobile: 768px;
 $breakpoint-tablet: 1024px;
 $breakpoint-desktop: 1440px;
 
-// 颜色
-$color-bg-primary: #000;
-$color-bg-secondary: #111;
-$color-bg-card: #111;
-$color-border: #430;
-$color-border-light: #531;
-$color-accent: #960;
-$color-text-primary: #ccc;
-$color-text-secondary: #aaa;
-$color-text-gold: #fe6;
-$color-text-red: #f00;
+// ============================================================
+// 主题配色（Wiki 风格）
+// 设计取向：浅色模仿「灰机 wiki」——纸张底色 + 白色卡片 + 金色点缀；
+//          深色模仿「fextralife」——炭黑底 + 金色链接，整体干净现代。
+// 所有组件一律通过 CSS 变量取色，禁止硬编码色值。
+// ============================================================
 
-// CSS变量
+// 浅色（默认）——灰机 wiki 风格
 :root {
-  --color-bg-primary: #{$color-bg-primary};
-  --color-bg-secondary: #{$color-bg-secondary};
-  --color-bg-card: #{$color-bg-card};
-  --color-border: #{$color-border};
-  --color-border-light: #{$color-border-light};
-  --color-accent: #{$color-accent};
-  --color-text-primary: #{$color-text-primary};
-  --color-text-secondary: #{$color-text-secondary};
-  --color-text-gold: #{$color-text-gold};
-  --color-text-red: #{$color-text-red};
+  --color-bg: #f4f1e9; // 页面底色（纸张）
+  --color-bg-secondary: #ffffff; // 卡片 / 内容区
+  --color-bg-tertiary: #efeadd; // 次级区块（表头 / 注释 / 引用块）
+  --color-bg-hover: #faf7f0; // 悬停底色
+  --color-surface: #ffffff; // 独立面板
+  --color-border: #d9d2c2;
+  --color-border-light: #e8e2d4;
+  --color-border-strong: #b3a688;
+
+  --color-header-bg: #2f2a22; // 顶部导航深色条（fextralife 观感）
+  --color-header-bg-soft: #3a342b;
+  --color-header-text: #ede6d6;
+  --color-header-text-muted: #b9b09c;
+
+  --color-text: #33302b;
+  --color-text-secondary: #6b655a;
+  --color-text-muted: #98917f;
+
+  --color-accent: #a97c2e; // 魂系金色
+  --color-accent-strong: #7d5a1e;
+  --color-accent-soft: rgba(169, 124, 46, 0.12);
+  --color-accent-border: rgba(169, 124, 46, 0.45);
+
+  --color-link: #5b7a9d; // wiki 蓝链接
+  --color-link-hover: #3d5a7d;
+  --color-link-visited: #6b5b95;
+
+  --color-gold: #a97c2e;
+  --color-red: #c0392b;
+  --color-green: #4e7a4e;
+
+  --color-mark: #ffe9a8; // 搜索高亮
+  --color-selection-bg: #a97c2e;
+  --color-selection-text: #fff;
+
+  --shadow-card: 0 1px 3px rgba(60, 50, 30, 0.08), 0 1px 2px rgba(60, 50, 30, 0.05);
+  --shadow-hover: 0 6px 18px rgba(60, 50, 30, 0.14);
+  --shadow-nav: 0 2px 8px rgba(30, 24, 12, 0.18);
 }
 
-// 浅色主题
-[data-theme='light'] {
-  --color-bg-primary: #f5f5f5;
-  --color-bg-secondary: #ffffff;
-  --color-bg-card: #fafafa;
-  --color-text-primary: #2a2a2a;
-  --color-text-secondary: #666666;
-  --color-text-gold: #d4a017;
-  --color-text-red: #d32f2f;
-  --color-accent: #d4a017;
-  --color-border: #e0e0e0;
-  --color-border-light: #cccccc;
+// 深色——fextralife 风格
+[data-theme='dark'] {
+  --color-bg: #141312;
+  --color-bg-secondary: #1d1b18;
+  --color-bg-tertiary: #26231f;
+  --color-bg-hover: #232019;
+  --color-surface: #191715;
+  --color-border: #3a352d;
+  --color-border-light: #2b2823;
+  --color-border-strong: #55493a;
+
+  --color-header-bg: #0d0c0b;
+  --color-header-bg-soft: #181614;
+  --color-header-text: #e5ddcc;
+  --color-header-text-muted: #8d8575;
+
+  --color-text: #d6d0c4;
+  --color-text-secondary: #a29a8b;
+  --color-text-muted: #7a7366;
+
+  --color-accent: #c9a227;
+  --color-accent-strong: #e0b52e;
+  --color-accent-soft: rgba(201, 162, 39, 0.14);
+  --color-accent-border: rgba(201, 162, 39, 0.5);
+
+  --color-link: #c9a227;
+  --color-link-hover: #e0b52e;
+  --color-link-visited: #a8893a;
+
+  --color-gold: #e0b52e;
+  --color-red: #e06c5a;
+  --color-green: #8fb573;
+
+  --color-mark: rgba(201, 162, 39, 0.35);
+
+  --color-selection-bg: #c9a227;
+  --color-selection-text: #141312;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --shadow-nav: 0 2px 10px rgba(0, 0, 0, 0.5);
 }

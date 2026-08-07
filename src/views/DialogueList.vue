@@ -1,55 +1,46 @@
 <template>
-  <div class="dialogue-list-view">
-    <ImprovedNavigation />
-    <div class="dialogue-list-layout">
-      <SidebarNav />
-      <main class="dialogue-list-main">
-        <div class="dialogue-list-container">
-          <h2 class="page-title">{{ title }}</h2>
+  <WikiLayout>
+    <h2 class="page-title">{{ title }}</h2>
 
-          <div v-if="loading" class="loading">
-            <div class="loading-spinner"></div>
-            <p>加载中...</p>
-          </div>
-
-          <div v-else-if="error" class="error">
-            <p>❌ 加载失败</p>
-            <p class="error-message">{{ error }}</p>
-          </div>
-
-          <div v-else-if="npcList.length === 0" class="empty">
-            <p>暂无对话数据</p>
-          </div>
-
-          <div v-else class="npc-grid">
-            <router-link
-              v-for="npc in npcList"
-              :key="npc"
-              :to="`/ds${game}/dialogue/${npc}`"
-              class="npc-card"
-            >
-              <div class="npc-icon">
-                <img
-                  :src="`/icons/ds${game}/dialogues/${npc}.webp`"
-                  :alt="npc"
-                  @error="handleImageError"
-                />
-              </div>
-              <div class="npc-name">{{ npc }}</div>
-            </router-link>
-          </div>
-        </div>
-      </main>
+    <div v-if="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>加载中...</p>
     </div>
-  </div>
+
+    <div v-else-if="error" class="error">
+      <p>❌ 加载失败</p>
+      <p class="error-message">{{ error }}</p>
+    </div>
+
+    <div v-else-if="npcList.length === 0" class="empty">
+      <p>暂无对话数据</p>
+    </div>
+
+    <div v-else class="npc-grid">
+      <router-link
+        v-for="npc in npcList"
+        :key="npc"
+        :to="`/ds${game}/dialogue/${npc}`"
+        class="npc-card"
+      >
+        <div class="npc-icon">
+          <img
+            :src="`/icons/ds${game}/dialogues/${npc}.webp`"
+            :alt="npc"
+            @error="handleImageError"
+          />
+        </div>
+        <div class="npc-name">{{ npc }}</div>
+      </router-link>
+    </div>
+  </WikiLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { GAME_NAMES } from '@/utils/constants'
 import { dataService } from '@/services/dataService'
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
-import SidebarNav from '@/components/layout/SidebarNav.vue'
+import WikiLayout from '@/components/layout/WikiLayout.vue'
 import type { GameVersion } from '@/types/item'
 
 const props = defineProps<{
@@ -66,7 +57,7 @@ const title = computed(() => {
   return `${GAME_NAMES[gameNum.value]} - NPC对话`
 })
 
-// NPC 列表由数据索引驱动（src/data/dialogueIndex.json），与数据目录 100% 一致
+// NPC 列表由数据索引驱动（src/data/dialogueIndex.json）
 const loadNPCList = async () => {
   loading.value = true
   error.value = null
@@ -92,44 +83,14 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.dialogue-list-view {
-  min-height: 100vh;
-  background: #000;
-}
-
-.dialogue-list-layout {
-  display: flex;
-  padding-top: var(--nav-height, 110px);
-  transition: padding-top 0.3s ease;
-
-  @media (max-width: 1000px) {
-    padding-top: var(--nav-height-mobile, 95px);
-  }
-}
-
-.dialogue-list-main {
-  flex: 1;
-  min-width: 0;
-}
-
-.dialogue-list-container {
-  padding: 2em;
-  max-width: 1400px;
-  margin: 0 auto;
-
-  @media (max-width: 1000px) {
-    padding: 1em;
-  }
-}
-
 .page-title {
-  color: #960;
-  font-size: 1.8em;
-  margin: 0 0 1.5em 0;
-  font-family: '仿宋', 'SimSun', serif;
+  color: var(--color-text);
+  font-size: 1.7em;
+  font-weight: 700;
+  margin: 0 0 1.25em;
 
-  @media (max-width: 1000px) {
-    font-size: 1.4em;
+  @media (max-width: 768px) {
+    font-size: 1.3em;
   }
 }
 
@@ -138,40 +99,29 @@ onMounted(() => {
 .empty {
   text-align: center;
   padding: 4em 2em;
-  color: #ccc;
-  font-family: '仿宋', 'SimSun', serif;
+  color: var(--color-text-secondary);
 
   .loading-spinner {
     width: 48px;
     height: 48px;
     margin: 0 auto 1em;
-    border: 4px solid #430;
-    border-top-color: #960;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
   }
 
   .error-message {
-    color: #f66;
+    color: var(--color-red);
     margin: 1em 0;
     font-size: 0.9em;
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 
 .npc-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1.5em;
+  gap: 1.25em;
 
-  @media (max-width: 1000px) {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1em;
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.9em;
   }
 }
 
@@ -179,36 +129,41 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5em 1em;
-  background: #111;
-  border: 1px solid #430;
-  transition: 0.3s;
+  padding: 1.5em 1em 1.25em;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
   text-decoration: none;
-  box-shadow: inset 0 0 0.3em 0.1em #531;
+  color: var(--color-text);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
 
   &:hover {
-    border-color: #960;
     transform: translateY(-4px);
-    box-shadow:
-      0 4px 12px rgba(153, 102, 0, 0.3),
-      inset 0 0 0.3em 0.1em #531;
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-accent-border);
+    text-decoration: none;
+    color: var(--color-text);
   }
 
   .npc-icon {
     width: 80px;
     height: 80px;
-    margin-bottom: 1em;
+    margin-bottom: 0.9em;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #000;
-    border: 1px solid #430;
+    background: var(--color-bg-tertiary);
+    border: 2px solid var(--color-border);
     border-radius: 50%;
     overflow: hidden;
 
-    @media (max-width: 1000px) {
-      width: 64px;
-      height: 64px;
+    @media (max-width: 768px) {
+      width: 60px;
+      height: 60px;
     }
 
     img {
@@ -219,15 +174,14 @@ onMounted(() => {
   }
 
   .npc-name {
-    color: #fe6;
-    font-size: 1em;
-    font-family: 'Palatino Linotype', serif;
+    color: var(--color-text);
+    font-size: 0.95em;
     text-align: center;
     text-transform: capitalize;
-    font-weight: 700;
+    font-weight: 600;
 
-    @media (max-width: 1000px) {
-      font-size: 0.9em;
+    @media (max-width: 768px) {
+      font-size: 0.85em;
     }
   }
 }

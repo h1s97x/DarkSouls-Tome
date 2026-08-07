@@ -1,85 +1,79 @@
 <template>
-  <div class="item-detail-view">
-    <ImprovedNavigation />
-    <div class="detail-layout">
-      <SidebarNav />
-      <main class="detail-main">
-        <div v-if="loading" class="loading">
-          <div class="loading-spinner"></div>
-          <p>加载中...</p>
-        </div>
-
-        <div v-else-if="error" class="error">
-          <p>{{ error.message }}</p>
-          <button @click="loadData">重试</button>
-        </div>
-
-        <div v-else-if="!item" class="not-found">
-          <p>物品不存在</p>
-          <router-link :to="`/ds${game}/${type}`">返回列表</router-link>
-        </div>
-
-        <div v-else class="contentd">
-          <!-- 物品框架 -->
-          <div class="frame">
-            <!-- 标题装饰线 -->
-            <div class="title-line"></div>
-
-            <!-- 物品标题 -->
-            <div class="item-title">{{ displayName }}</div>
-
-            <div class="title-line"></div>
-
-            <!-- 内容区域 -->
-            <div class="content-wrapper">
-              <!-- 左侧图标 -->
-              <div class="left-icon">
-                <img :src="item.icon" :alt="displayName" @error="handleImageError" />
-              </div>
-
-              <!-- 右侧内容 -->
-              <div class="right-content">
-                <!-- 物品描述 -->
-                <div class="item-desc" v-html="formatText(displayDescription)"></div>
-
-                <!-- 备注 -->
-                <div
-                  v-if="displayRemark"
-                  class="item-remk"
-                  v-html="formatText(displayRemark)"
-                ></div>
-              </div>
-            </div>
-
-            <!-- 底部装饰线 -->
-            <div class="title-line"></div>
-
-            <!-- 收藏按钮 -->
-            <div class="actions">
-              <button class="favorite-btn" :class="{ active: isFavorite }" @click="toggleFavorite">
-                {{ isFavorite ? '★ 已收藏' : '☆ 收藏' }}
-              </button>
-            </div>
-          </div>
-
-          <!-- 相关物品 -->
-          <div v-if="relatedItems.length > 0" class="related-section">
-            <div class="frame">
-              <p class="section-title">相关物品</p>
-              <router-link
-                v-for="related in relatedItems"
-                :key="itemKey(related)"
-                :to="`/ds${game}/${type}/${related.id}`"
-                class="icon related-item"
-              >
-                <img :src="related.icon" :alt="getItemName(related)" @error="handleImageError" />
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </main>
+  <WikiLayout>
+    <div v-if="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>加载中...</p>
     </div>
-  </div>
+
+    <div v-else-if="error" class="error">
+      <p>{{ error.message }}</p>
+      <button @click="loadData">重试</button>
+    </div>
+
+    <div v-else-if="!item" class="not-found">
+      <p>物品不存在</p>
+      <router-link :to="`/ds${game}/${type}`">返回列表</router-link>
+    </div>
+
+    <template v-else>
+      <!-- 面包屑 -->
+      <nav class="breadcrumbs" aria-label="面包屑">
+        <router-link :to="`/ds${game}/${type}`">{{ typeName }}</router-link>
+        <span class="sep">›</span>
+        <span class="current">{{ displayName }}</span>
+      </nav>
+
+      <!-- 物品主体 -->
+      <article class="item-article">
+        <header class="article-header">
+          <div class="article-icon">
+            <img :src="item.icon" :alt="displayName" @error="handleImageError" />
+          </div>
+          <div class="article-heading">
+            <h1 class="article-title">{{ displayName }}</h1>
+            <p class="article-sub">
+              <span>{{ gameName }}</span>
+              <span class="dot">·</span>
+              <span>{{ typeName }}</span>
+              <span class="dot">·</span>
+              <span class="item-id">ID {{ item.id }}</span>
+            </p>
+            <button class="favorite-btn" :class="{ active: isFavorite }" @click="toggleFavorite">
+              {{ isFavorite ? '★ 已收藏' : '☆ 收藏' }}
+            </button>
+          </div>
+        </header>
+
+        <!-- 简介 -->
+        <section class="article-section">
+          <h2 class="section-title">简介</h2>
+          <div class="section-body item-desc" v-html="formatText(displayDescription)"></div>
+        </section>
+
+        <!-- 备注 -->
+        <section v-if="displayRemark" class="article-section">
+          <h2 class="section-title">备注</h2>
+          <div class="section-body item-remk" v-html="formatText(displayRemark)"></div>
+        </section>
+      </article>
+
+      <!-- 相关物品 -->
+      <section v-if="relatedItems.length > 0" class="related-section">
+        <h2 class="section-title">相关物品</h2>
+        <div class="related-grid">
+          <router-link
+            v-for="related in relatedItems"
+            :key="itemKey(related)"
+            :to="`/ds${game}/${type}/${related.id}`"
+            class="related-item"
+          >
+            <img :src="related.icon" :alt="getItemName(related)" @error="handleImageError" />
+            <span class="related-name">{{ getItemName(related) }}</span>
+          </router-link>
+        </div>
+      </section>
+    </template>
+  </WikiLayout>
 </template>
 
 <script setup lang="ts">
@@ -87,9 +81,9 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useGameData } from '@/composables/useGameData'
 import { useUserStore } from '@/stores/user'
 import { dataService, itemKey } from '@/services/dataService'
+import { GAME_NAMES, ITEM_TYPE_NAMES } from '@/utils/constants'
 import { formatGameText } from '@/utils/formatter'
-import ImprovedNavigation from '@/components/layout/ImprovedNavigation.vue'
-import SidebarNav from '@/components/layout/SidebarNav.vue'
+import WikiLayout from '@/components/layout/WikiLayout.vue'
 import type { GameVersion, ItemType, Item } from '@/types/item'
 
 const props = defineProps<{
@@ -102,6 +96,9 @@ const userStore = useUserStore()
 
 const gameNum = computed(() => Number(props.game) as GameVersion)
 const itemType = computed(() => props.type as ItemType)
+
+const gameName = computed(() => GAME_NAMES[gameNum.value] || '')
+const typeName = computed(() => ITEM_TYPE_NAMES[itemType.value] || '')
 
 const { items, loading, error, loadData } = useGameData(gameNum.value, itemType.value)
 
@@ -136,7 +133,6 @@ const loadRelatedItems = async () => {
     return
   }
   try {
-    // 相关物品查询统一收口到 dataService（同游戏同类型，排除自身）
     relatedItems.value = await dataService.getRelatedItems(item.value)
   } catch (e) {
     console.error('Failed to load related items:', e)
@@ -167,7 +163,7 @@ onMounted(() => {
   loadData()
 })
 
-// 物品加载完成后加载相关物品（id 或数据变化时都触发）
+// 物品加载完成后加载相关物品
 watch(
   item,
   () => {
@@ -187,267 +183,270 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.item-detail-view {
-  min-height: 100vh;
-  background: #000;
-}
-
-.detail-layout {
-  display: flex;
-  padding-top: var(--nav-height, 110px);
-  transition: padding-top 0.3s ease;
-
-  @media (max-width: 1000px) {
-    padding-top: var(--nav-height-mobile, 95px);
-  }
-}
-
-.detail-main {
-  flex: 1;
-  min-width: 0;
-}
-
 .loading,
 .error,
 .not-found {
   text-align: center;
   padding: 4em 2em;
-  color: #ccc;
-  font-family: '仿宋', 'SimSun', serif;
+  color: var(--color-text-secondary);
 
   .loading-spinner {
     width: 48px;
     height: 48px;
     margin: 0 auto 1em;
-    border: 4px solid #430;
-    border-top-color: #960;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
   }
 
   button,
   a {
     margin-top: 1em;
     padding: 0.5em 2em;
-    background: #111;
-    border: 1px solid #430;
-    color: #960;
-    font-family: '仿宋', 'SimSun', serif;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-accent);
     cursor: pointer;
-    transition: 0.3s;
     display: inline-block;
     text-decoration: none;
 
     &:hover {
-      border-color: #960;
-      background: #222;
+      border-color: var(--color-accent);
     }
   }
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-// 原版风格
-.contentd {
-  width: 1800px;
-  margin: 0 auto;
-  overflow: hidden;
-
-  @media (max-width: 1800px) {
-    width: 100%;
-    padding: 0 1em;
-  }
-}
-
-.frame {
-  text-align: center;
-  overflow: hidden;
-  background: #111;
-  padding: 3em 2em;
-  margin: 1em 0 2em;
-  box-shadow: inset 0 0 0.3em 0.1em #531;
-  font:
-    18px/1.5 '仿宋',
-    'SimSun',
-    serif;
-  color: #ccc;
-  position: relative;
-
-  @media (max-width: 1000px) {
-    font:
-      12px/1.5 '仿宋',
-      'SimSun',
-      serif;
-    margin: 0 0 2em;
-  }
-}
-
-.title-line {
-  height: 1px;
-  background: linear-gradient(to right, transparent, #960, transparent);
-  margin: 2em 0;
-
-  @media (max-width: 1000px) {
-    margin: 1.5em 0;
-  }
-}
-
-.item-title {
-  font-size: 2em;
-  font-weight: 700;
-  color: #960;
-  font-family: 'Palatino Linotype', '仿宋', serif;
-  text-align: center;
-  padding: 0 2em;
-
-  @media (max-width: 1000px) {
-    font-size: 1.5em;
-    padding: 0 1em;
-  }
-}
-
-.content-wrapper {
+/* ---------- 面包屑 ---------- */
+.breadcrumbs {
   display: flex;
-  gap: 3em;
-  padding: 2em 3em;
-  align-items: flex-start;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 1.25em;
+  font-size: 0.9em;
+  color: var(--color-text-muted);
 
-  @media (max-width: 1000px) {
-    flex-direction: column;
-    gap: 2em;
-    padding: 1.5em 1em;
-    align-items: center;
+  a {
+    color: var(--color-link);
+  }
+
+  .sep {
+    color: var(--color-text-muted);
+  }
+
+  .current {
+    color: var(--color-text);
+    font-weight: 600;
   }
 }
 
-.left-icon {
+/* ---------- 物品主体 ---------- */
+.item-article {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  padding: 2em 2.5em;
+  margin-bottom: 2em;
+
+  @media (max-width: 768px) {
+    padding: 1.25em 1.25em;
+  }
+}
+
+.article-header {
+  display: flex;
+  gap: 1.75em;
+  align-items: flex-start;
+  padding-bottom: 1.5em;
+  margin-bottom: 1.5em;
+  border-bottom: 1px solid var(--color-border);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1em;
+  }
+}
+
+.article-icon {
   flex-shrink: 0;
-  width: 150px;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
 
   img {
-    width: 100%;
-    height: auto;
-    display: block;
+    max-width: 88px;
+    max-height: 88px;
+    object-fit: contain;
   }
 
-  @media (max-width: 1000px) {
-    width: 120px;
+  @media (max-width: 768px) {
+    width: 90px;
+    height: 90px;
+
+    img {
+      max-width: 64px;
+      max-height: 64px;
+    }
   }
 }
 
-.right-content {
+.article-heading {
   flex: 1;
   min-width: 0;
 }
 
-.item-desc {
-  line-height: 1.8;
-  margin-bottom: 2em;
+.article-title {
+  font-size: 1.9em;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.35em;
+
+  @media (max-width: 768px) {
+    font-size: 1.45em;
+  }
+}
+
+.article-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  color: var(--color-text-muted);
+  font-size: 0.95em;
+  margin-bottom: 1.1em;
+  flex-wrap: wrap;
+
+  .dot {
+    color: var(--color-border-strong);
+  }
+}
+
+.favorite-btn {
+  padding: 0.5em 1.4em;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-accent);
+  font-weight: 600;
+
+  &:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  &.active {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent-strong);
+  }
+}
+
+/* ---------- 章节 ---------- */
+.article-section {
+  margin-bottom: 1.75em;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-title {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.75em;
+  padding-bottom: 0.35em;
+  border-bottom: 2px solid var(--color-accent-border);
+
+  @media (max-width: 768px) {
+    font-size: 1.1em;
+  }
+}
+
+.section-body {
+  color: var(--color-text);
+  line-height: 1.9;
+  font-size: 1em;
 
   :deep(p) {
     margin: 0;
-    padding: 0.5em 0;
+    padding: 0.55em 0;
 
     &:not(:last-child) {
-      border-bottom: 1px solid #321;
-    }
-  }
-
-  @media (max-width: 1000px) {
-    font-size: 1.1em;
-    margin-bottom: 1.5em;
-
-    :deep(p) {
-      padding: 0.8em 0;
+      border-bottom: 1px dashed var(--color-border-light);
     }
   }
 }
 
 .item-remk {
-  color: #fe6;
-  line-height: 1.8;
+  background: var(--color-bg-tertiary);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75em 1.25em;
+  color: var(--color-text-secondary);
 
   :deep(p) {
-    margin: 0;
-    padding: 0.5em 0;
-  }
-
-  @media (max-width: 1000px) {
-    font-size: 1.1em;
-
-    :deep(p) {
-      padding: 0.8em 0;
-    }
+    border-bottom: none !important;
   }
 }
 
-.actions {
-  clear: both;
-  padding: 2em 0 0;
-  text-align: center;
-
-  .favorite-btn {
-    padding: 0.6em 1.5em;
-    background: #222;
-    border: 1px solid #430;
-    color: #960;
-    font-family: '仿宋', 'SimSun', serif;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 1em;
-
-    &:hover {
-      background: #333;
-      border-color: #960;
-    }
-
-    &.active {
-      background: rgba(153, 102, 0, 0.2);
-      border-color: #960;
-      color: #fe6;
-    }
-  }
-
-  @media (max-width: 1000px) {
-    padding: 1.5em 0 0;
-  }
-}
-
+/* ---------- 相关物品 ---------- */
 .related-section {
-  .section-title {
-    color: #960;
-    font-size: 1.2em;
-    margin-bottom: 1em;
-    font-weight: 700;
+  margin-top: 0.5em;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1em;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75em;
+  }
+}
+
+.related-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+  padding: 1em 0.75em;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: var(--color-text);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-accent-border);
+    text-decoration: none;
+    color: var(--color-text);
   }
 
-  .related-item {
-    float: left;
-    width: 10%;
-    height: 11em;
-    margin: 0 1.2em;
-    opacity: 0.85;
-    transition: 0.3s;
+  img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+  }
 
-    &:hover {
-      opacity: 1;
-      border: 5px solid #531;
-    }
-
-    img {
-      margin: 0;
-      transform: none;
-    }
-
-    @media (max-width: 1000px) {
-      margin: 5em 0;
-      width: 33%;
-      height: auto;
-    }
+  .related-name {
+    font-size: 0.85em;
+    text-align: center;
+    color: var(--color-text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 </style>

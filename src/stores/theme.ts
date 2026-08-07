@@ -4,8 +4,8 @@ import { ref, watch } from 'vue'
 export type Theme = 'dark' | 'light' | 'auto'
 
 export const useThemeStore = defineStore('theme', () => {
-  const currentTheme = ref<Theme>('dark')
-  const systemTheme = ref<'dark' | 'light'>('dark')
+  const currentTheme = ref<Theme>('light')
+  const systemTheme = ref<'dark' | 'light'>('light')
 
   // 检测系统主题
   const detectSystemTheme = () => {
@@ -18,7 +18,11 @@ export const useThemeStore = defineStore('theme', () => {
   // 应用主题
   const applyTheme = (theme: 'dark' | 'light') => {
     if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', theme)
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark')
+      } else {
+        document.documentElement.removeAttribute('data-theme')
+      }
     }
   }
 
@@ -34,6 +38,11 @@ export const useThemeStore = defineStore('theme', () => {
     }
   }
 
+  // 切换明暗（循环：light -> dark -> light）
+  const toggleTheme = () => {
+    setTheme(currentTheme.value === 'light' ? 'dark' : 'light')
+  }
+
   // 加载主题
   const loadTheme = () => {
     detectSystemTheme()
@@ -42,7 +51,8 @@ export const useThemeStore = defineStore('theme', () => {
     if (saved && ['dark', 'light', 'auto'].includes(saved)) {
       setTheme(saved)
     } else {
-      setTheme('dark')
+      // 默认浅色（灰机 wiki 风格）；跟随系统仍可用 'auto'
+      setTheme('light')
     }
   }
 
@@ -70,6 +80,7 @@ export const useThemeStore = defineStore('theme', () => {
     currentTheme,
     systemTheme,
     setTheme,
+    toggleTheme,
     loadTheme
   }
 })

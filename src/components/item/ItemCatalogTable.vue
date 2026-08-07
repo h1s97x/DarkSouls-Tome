@@ -1,9 +1,9 @@
 <template>
   <div class="item-catalog-table">
     <div class="table-header">
-      <h2>{{ title }}</h2>
+      <h2 class="page-title">{{ title }}</h2>
       <div class="table-controls">
-        <input v-model="searchQuery" type="text" placeholder="搜索物品..." class="search-input" />
+        <input v-model="searchQuery" type="text" placeholder="搜索物品…" class="search-input" />
         <span class="item-count">共 {{ filteredItems.length }} 项</span>
       </div>
     </div>
@@ -22,39 +22,41 @@
       <p>没有找到物品</p>
     </div>
 
-    <table v-else class="catalog-table">
-      <thead>
-        <tr>
-          <th class="icon-col">图标</th>
-          <th class="name-col">名称</th>
-          <th class="desc-col">描述</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="item in filteredItems"
-          :key="itemKey(item)"
-          class="table-row"
-          @click="goToDetail(item.id)"
-        >
-          <td class="icon-cell">
-            <LazyImage :src="`/icons/${item.icon}`" :alt="displayName(item)" />
-          </td>
-          <td class="name-cell">
-            <span class="name-text" v-html="highlightedName(item)"></span>
-          </td>
-          <td class="desc-cell">
-            <span class="desc-text" v-html="highlightedDesc(item)"></span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else class="table-wrapper">
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th class="icon-col">图标</th>
+            <th class="name-col">名称</th>
+            <th class="desc-col">描述</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in filteredItems"
+            :key="itemKey(item)"
+            class="table-row"
+            @click="goToDetail(item.id)"
+          >
+            <td class="icon-cell">
+              <LazyImage :src="`/icons/${item.icon}`" :alt="displayName(item)" />
+            </td>
+            <td class="name-cell">
+              <span class="name-text" v-html="highlightedName(item)"></span>
+            </td>
+            <td class="desc-cell">
+              <span class="desc-text" v-html="highlightedDesc(item)"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import LazyImage from '@/components/common/LazyImage.vue'
 import { ItemQuery, itemKey } from '@/services/itemQuery'
@@ -74,9 +76,18 @@ defineEmits<{
   retry: []
 }>()
 
+const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const searchQuery = ref('')
+
+// 支持从首页搜索框带 ?q= 参数进入
+onMounted(() => {
+  const q = typeof route.query.q === 'string' ? route.query.q : ''
+  if (q) {
+    searchQuery.value = q
+  }
+})
 
 const displayName = (item: Item) => {
   return item.name[userStore.currentLanguage]
@@ -86,20 +97,17 @@ const displayDescription = (item: Item) => {
   return item.description[userStore.currentLanguage]
 }
 
-/**
- * 过滤逻辑统一收口到 ItemQuery 查询引擎（阶段 3）
- * 跨语言匹配名称/描述/备注，归一化（去格式标记 + 大小写不敏感）后命中。
- */
+/** 过滤逻辑统一收口到 ItemQuery 查询引擎（阶段 3） */
 const filteredItems = computed(() => {
   return ItemQuery.from(props.items).search(searchQuery.value).paginate(1, Infinity).items
 })
 
-/** 名称高亮（搜索关键词命中时显示 <mark>，先剥离格式标记避免残留 ## 等） */
+/** 名称高亮 */
 const highlightedName = (item: Item) => {
   return highlightText(stripFormatting(displayName(item)), searchQuery.value)
 }
 
-/** 描述高亮（截断前 80 字，命中关键词处高亮） */
+/** 描述高亮（截断前 80 字） */
 const highlightedDesc = (item: Item) => {
   const desc = displayDescription(item)
   const plain = normalizeForSearch(desc)
@@ -114,74 +122,55 @@ const goToDetail = (id: string) => {
 
 <style scoped lang="scss">
 .item-catalog-table {
-  padding: 2em;
-  max-width: 1400px;
-  margin: 0 auto;
-
-  @media (max-width: 1000px) {
-    padding: 1em;
-  }
+  width: 100%;
 }
 
 .table-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2em;
+  align-items: flex-end;
+  margin-bottom: 1.25em;
   flex-wrap: wrap;
   gap: 1em;
+}
 
-  h2 {
-    color: #960;
-    font-size: 1.8em;
-    margin: 0;
-    font-family: '仿宋', 'SimSun', serif;
+.page-title {
+  color: var(--color-text);
+  font-size: 1.7em;
+  font-weight: 700;
+  margin: 0;
 
-    @media (max-width: 1000px) {
-      font-size: 1.4em;
-    }
+  @media (max-width: 768px) {
+    font-size: 1.3em;
   }
+}
 
-  .table-controls {
-    display: flex;
-    align-items: center;
-    gap: 1em;
+.table-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
 
-    @media (max-width: 1000px) {
-      width: 100%;
-    }
+  @media (max-width: 768px) {
+    width: 100%;
   }
+}
 
-  .search-input {
-    padding: 0.6em 1em;
-    background: #111;
-    border: 1px solid #430;
-    color: #ccc;
-    font-size: 1em;
-    font-family: '仿宋', 'SimSun', serif;
-    min-width: 250px;
-    transition: 0.3s;
+.search-input {
+  padding: 0.55em 1em;
+  border-radius: 8px;
+  min-width: 260px;
+  font-size: 0.95em;
 
-    &:focus {
-      border-color: #960;
-      outline: none;
-    }
-
-    &::placeholder {
-      color: #666;
-    }
-
-    @media (max-width: 1000px) {
-      flex: 1;
-      min-width: 0;
-    }
+  @media (max-width: 768px) {
+    flex: 1;
+    min-width: 0;
   }
+}
 
-  .item-count {
-    color: #aaa;
-    font-size: 0.9em;
-    white-space: nowrap;
-  }
+.item-count {
+  color: var(--color-text-muted);
+  font-size: 0.9em;
+  white-space: nowrap;
 }
 
 .loading,
@@ -189,8 +178,7 @@ const goToDetail = (id: string) => {
 .empty {
   text-align: center;
   padding: 4em 2em;
-  color: #ccc;
-  font-family: '仿宋', 'SimSun', serif;
+  color: var(--color-text-secondary);
 
   .loading-spinner {
     margin: 0 auto 1em;
@@ -199,71 +187,67 @@ const goToDetail = (id: string) => {
   button {
     margin-top: 1em;
     padding: 0.5em 2em;
-    background: #111;
-    border: 1px solid #430;
-    color: #960;
-    font-family: '仿宋', 'SimSun', serif;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-accent);
     cursor: pointer;
-    transition: 0.3s;
 
     &:hover {
-      border-color: #960;
-      background: #222;
+      border-color: var(--color-accent);
     }
   }
+}
+
+.table-wrapper {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
 .catalog-table {
   width: 100%;
   border-collapse: collapse;
-  background: #111;
-  box-shadow: inset 0 0 0.3em 0.1em #531;
 
   thead {
-    background: #222;
-    position: sticky;
-    top: 150px;
-    z-index: 10;
-
-    @media (max-width: 1000px) {
-      top: 6em;
-    }
+    background: var(--color-bg-tertiary);
 
     th {
-      padding: 1em;
+      padding: 0.85em 1em;
       text-align: left;
-      color: #960;
-      border-bottom: 2px solid #430;
+      color: var(--color-text-secondary);
+      border-bottom: 2px solid var(--color-border);
       font-weight: 700;
-      font-family: '仿宋', 'SimSun', serif;
-      font-size: 1.1em;
+      font-size: 0.9em;
+      white-space: nowrap;
 
-      @media (max-width: 1000px) {
-        padding: 0.75em 0.5em;
-        font-size: 1em;
+      @media (max-width: 768px) {
+        padding: 0.7em 0.6em;
       }
     }
 
     .icon-col {
-      width: 80px;
+      width: 64px;
 
-      @media (max-width: 1000px) {
-        width: 60px;
+      @media (max-width: 768px) {
+        width: 52px;
       }
     }
 
     .name-col {
-      width: 25%;
+      width: 26%;
 
-      @media (max-width: 1000px) {
-        width: 35%;
+      @media (max-width: 768px) {
+        width: 40%;
       }
     }
 
     .desc-col {
       width: auto;
 
-      @media (max-width: 1000px) {
+      @media (max-width: 768px) {
         display: none;
       }
     }
@@ -271,12 +255,12 @@ const goToDetail = (id: string) => {
 
   tbody {
     tr {
-      border-bottom: 1px solid #321;
+      border-bottom: 1px solid var(--color-border-light);
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.2s;
 
       &:hover {
-        background: rgba(153, 102, 0, 0.1);
+        background: var(--color-bg-hover);
       }
 
       &:last-child {
@@ -285,25 +269,25 @@ const goToDetail = (id: string) => {
     }
 
     td {
-      padding: 1em;
-      color: #ccc;
+      padding: 0.8em 1em;
+      color: var(--color-text);
       vertical-align: middle;
 
-      @media (max-width: 1000px) {
-        padding: 0.75em 0.5em;
+      @media (max-width: 768px) {
+        padding: 0.65em 0.6em;
       }
     }
 
     .icon-cell {
       img {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         object-fit: contain;
         display: block;
 
-        @media (max-width: 1000px) {
-          width: 40px;
-          height: 40px;
+        @media (max-width: 768px) {
+          width: 38px;
+          height: 38px;
         }
       }
     }
@@ -311,36 +295,38 @@ const goToDetail = (id: string) => {
     .name-cell {
       .name-text {
         font-weight: 700;
-        color: #fe6;
-        font-size: 1.05em;
-        font-family: '仿宋', 'SimSun', serif;
+        color: var(--color-text);
+        font-size: 1em;
 
-        @media (max-width: 1000px) {
-          font-size: 1em;
+        :deep(mark) {
+          background: var(--color-mark);
+          color: inherit;
+          border-radius: 3px;
+          padding: 0 0.15em;
         }
-      }
-
-      :deep(mark) {
-        background: rgba(153, 102, 0, 0.4);
-        color: #fe6;
-        padding: 0 0.1em;
       }
     }
 
     .desc-cell {
-      @media (max-width: 1000px) {
+      @media (max-width: 768px) {
         display: none;
       }
 
       .desc-text {
-        color: #999;
-        font-size: 0.95em;
+        color: var(--color-text-secondary);
+        font-size: 0.92em;
         line-height: 1.6;
+        display: block;
+        max-width: 720px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         :deep(mark) {
-          background: rgba(153, 102, 0, 0.4);
-          color: #fe6;
-          padding: 0 0.1em;
+          background: var(--color-mark);
+          color: inherit;
+          border-radius: 3px;
+          padding: 0 0.15em;
         }
       }
     }

@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-// 经典风格不需要额外逻辑
+// Wiki 风格不需要额外逻辑
 </script>
 
 <style lang="scss">
@@ -17,13 +17,13 @@
 
 #app {
   min-height: 100vh;
-  background: #000;
+  background: var(--color-bg);
 }
 
 /* 简单的淡入淡出过渡 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .fade-enter-from,

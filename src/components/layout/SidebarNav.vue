@@ -94,23 +94,23 @@ const closeSidebar = () => {
 <style scoped lang="scss">
 .sidebar-nav {
   width: 200px;
-  background: #111;
-  border-right: 1px solid #430;
-  position: sticky;
-  top: 150px;
-  height: calc(100vh - 150px);
-  overflow-y: auto;
   flex-shrink: 0;
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
+  position: sticky;
+  top: var(--nav-height, 64px);
+  height: calc(100vh - var(--nav-height, 64px));
+  overflow-y: auto;
 
-  @media (max-width: 1000px) {
+  @media (max-width: 900px) {
     position: fixed;
-    top: 6em;
+    top: var(--nav-height-mobile, 56px);
     left: 0;
-    height: calc(100vh - 6em);
+    height: calc(100vh - var(--nav-height-mobile, 56px));
     z-index: 998;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
 
     &.is-open {
       transform: translateX(0);
@@ -121,23 +121,23 @@ const closeSidebar = () => {
 .sidebar-toggle {
   display: none;
   position: fixed;
-  top: 7em;
+  top: calc(var(--nav-height, 64px) + 0.5em);
   left: 0.5em;
   z-index: 999;
-  background: #111;
-  border: 1px solid #430;
-  color: #960;
-  padding: 0.5em 0.75em;
-  font-size: 1.2em;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-accent);
+  padding: 0.45em 0.7em;
+  font-size: 1.1em;
   cursor: pointer;
-  transition: 0.3s;
+  box-shadow: var(--shadow-card);
 
   &:hover {
-    background: #222;
-    border-color: #960;
+    border-color: var(--color-accent);
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 900px) {
     display: block;
   }
 }
@@ -155,39 +155,44 @@ const closeSidebar = () => {
 }
 
 .section-title {
-  color: #960;
-  font-size: 1em;
-  margin-bottom: 0.75em;
-  padding-bottom: 0.5em;
-  border-bottom: 1px solid #430;
+  color: var(--color-text-secondary);
+  font-size: 0.8em;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .nav-list {
   list-style: none;
 
   li {
-    margin: 0.25em 0;
+    margin: 0.15em 0;
   }
 
   a {
     display: block;
     padding: 0.5em 0.75em;
-    color: #aaa;
-    transition: 0.3s;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: 6px;
     border-left: 3px solid transparent;
     font-size: 0.95em;
+    transition:
+      background 0.2s,
+      color 0.2s;
 
     &:hover {
-      color: #960;
-      background: rgba(153, 102, 0, 0.1);
-      border-left-color: #960;
+      color: var(--color-accent);
+      background: var(--color-accent-soft);
     }
 
     &.active {
-      color: #960;
-      background: rgba(153, 102, 0, 0.15);
-      border-left-color: #960;
+      color: var(--color-accent-strong);
+      background: var(--color-accent-soft);
+      border-left-color: var(--color-accent);
       font-weight: 700;
     }
   }
@@ -199,11 +204,11 @@ const closeSidebar = () => {
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
-  background: #430;
+  background: var(--color-border-strong);
   border-radius: 3px;
 
   &:hover {
-    background: #960;
+    background: var(--color-accent);
   }
 }
 </style>

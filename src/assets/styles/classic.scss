@@ -1,51 +1,33 @@
-// 原版风格混入和样式
+// 原版特殊文本样式（保留，用于数据中的 [uud][cgb][cgd][dtt] 标记）
+// 颜色跟随主题变量，保证浅色/深色下都清晰可读
 
-// 经典框架样式
-@mixin classic-frame {
-  text-align: center;
-  overflow: hidden;
-  background: #111;
-  padding: 3em 2em;
-  margin: 1em 0 2em;
-  box-shadow: inset 0 0 0.3em 0.1em #531;
-  font:
-    18px/1.5 仿宋,
-    SimSun,
-    serif;
-  color: #ccc;
-}
-
-// 经典边框样式
-@mixin classic-border {
-  border-bottom: 1px solid #430;
-  padding: 0.25em 0;
-}
-
-// 特殊文本样式
+// 未使用文本 - 红色删除线
 .uud {
   text-decoration: line-through;
-  text-decoration-color: rgba(255, 0, 0, 0.4);
-  text-decoration-thickness: 0.2em;
+  text-decoration-color: var(--color-red, rgba(255, 0, 0, 0.4));
+  text-decoration-thickness: 0.15em;
+  color: inherit;
 }
 
+// 已改变文本 - 删除线
 .cgb {
   text-decoration: line-through;
-  text-decoration-color: rgba(255, 238, 102, 0.8);
-  text-decoration-thickness: 0.2em;
+  text-decoration-color: var(--color-accent, rgba(255, 238, 102, 0.8));
+  text-decoration-thickness: 0.15em;
+  color: inherit;
 }
 
+// 金色文本
 .cgd {
-  color: #fe6;
+  color: var(--color-gold, #fe6);
 }
 
+// 标题文本
 .dtt {
-  font-size: 0.8em;
+  display: inline-block;
+  font-size: 0.9em;
   font-weight: 700;
-  color: #fff;
-  background: linear-gradient(to right, rgba(80, 48, 1, 0), #531, rgba(80, 48, 1, 0));
-}
-
-.chn .dtt,
-.jap .dtt {
-  letter-spacing: 1px;
+  color: var(--color-accent-strong, #fff);
+  padding: 0 0.6em;
+  border-radius: 4px;
 }
