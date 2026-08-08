@@ -21,6 +21,24 @@ main:
 
 # issue.* 事件需挂靠在 $ 兜底分支下，使用默认分支的配置执行
 $:
+  # 手动拉取 GitHub 提交（通过 .cnb/web_trigger.yml 配置的按钮触发）
+  # 在「代码-分支详情页」点击「拉取 GitHub 提交」按钮，输入 GitHub 仓库地址与分支后执行
+  web_trigger_pull_github:
+    - name: pull-from-github
+      imports:
+        - https://cnb.cool/h1s97x/secret-env/-/blob/main/env.yml
+      stages:
+        - name: pull github commits
+          image: tencentcom/git-sync
+          settings:
+            target_url: ${github_repo}
+            auth_type: https
+            username: ${GITHUB_USERNAME}
+            password: ${GITHUB_TOKEN}
+            sync_mode: pull
+            branch: ${pull_branch}
+            push_tags: true
+
   # Issue 创建后自动分配处理人
   issue.open:
     - name: auto-assign-issue-owner
